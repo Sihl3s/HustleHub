@@ -1,0 +1,32 @@
+{
+  "name": "hustlehub-backend",
+  "version": "1.0.0",
+  "description": "HustleHub+ secure freelance marketplace API (Part 1: authentication foundations)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "generate-certs": "node scripts/generate-certs.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "express",
+    "jwt",
+    "https",
+    "hustlehub"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "selfsigned": "^2.4.1"
+  }
+}
