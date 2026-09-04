@@ -89,4 +89,3 @@ Replace the headings below with the written explanations required for Part 1. In
 | Lesedi | Backend / Authorisation | Implement `backend/src/utils/password.js` (bcrypt hash and verify) and `backend/src/models/userStore.js` (file-based user storage). Function names and comments are already in those files. |
 | Blessing | Architecture | Complete the README sections above and add the MERN architecture diagram. |
 | Thami | Testing | Build the Postman collection, capture API screenshots, record the demonstration video, and tick off the checklist in [postman/README.md](postman/README.md). |
-| Sihle | Security | JWT middleware, input validation, secure error handling, and HTTPS/SSL (done in this Part 1 backend). |
