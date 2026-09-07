@@ -6,11 +6,10 @@ const { logEvent } = require('../utils/logger');
 
 function toPublicUser(user) {
   return {
-    id: user.id,
     email: user.email,
+    password: user.password,
     fullName: user.fullName,
     role: user.role,
-    createdAt: user.createdAt,
   };
 }
 
