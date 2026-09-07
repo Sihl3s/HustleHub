@@ -171,7 +171,7 @@ The frontend then updates the user interface accordingly.
 
 ---
 
-# 🔐 Security
+# Security
 
 Security is a primary design consideration within Hustle Hub+ because the platform processes sensitive information, including:
 
@@ -349,7 +349,7 @@ This is implemented using the bycrypt.js library. It accepts a plain text passwo
 
 Compared a plain text password with a stored hash using bcrypt.compare and then returns a boolean, true if it matches the hash and false if it doesn't.
 
-# 🚀 Getting Started
+# Getting Started
 
 ## Prerequisites
 
@@ -362,7 +362,7 @@ Before running Hustle Hub+, ensure the following are installed:
 
 ---
 
-# ⚙️ Environment Variables
+# Environment Variables
 
 Sensitive configuration values should be stored in environment variables rather than directly in the source code.
 
@@ -374,7 +374,7 @@ JWT_SECRET=your-secret-key
 
 ---
 
-# ▶️ Running the Application (Part 1)
+# Running the Application (Part 1)
 
 Start the backend API:
 
@@ -401,7 +401,7 @@ The API listens on https://127.0.0.1:3443.
 
 ---
 
-# 📚 Security References
+# Security References
 
 The security design of Hustle Hub+ was informed by established security guidance and standards, including:
 
@@ -412,15 +412,15 @@ The security design of Hustle Hub+ was informed by established security guidance
 
 ---
 
-# 👨‍💻 Authors
+# Authors
 
-Sihle , Nomathansanqa, Lesedi and Blessing.
+Sihle, Nomathansanqa, Lesedi and Blessing.
 
 # Reference List:
 
 Sources used for Part 1 security and backend decisions.
 - Expressjs (2025) *Production best practices: security*. Available at: https://expressjs.com/en/advanced/best-practice-security.html (Accessed: 4 September 2026).
-- Grassi, P.A., Garcia, M.E. and Fenton, J.L. (2017) *Digital identity guidelines: authentication and lifecycle management*. NIST Special Publication 800-63B. Gaithersburg: National Institute of Standards and Technology. Available at: https://doi.org/10.6028/NIST.SP.800-63b (Accessed: 4 September 2026).
+- Grassi, P.A., Garcia, M.E. and Fenton, J.L. (2017) *Digital identity guidelines: authentication and lifecycle management*. NIST Special Publication 800-63B. Gaithersburg: National Institute of Standards and Technology. Available at: https://doi.org/10.6028/NIST.SP.800-63b (Accessed: 4 September 2026). 
 - Helmetjs (2025) *Helmet: help secure Express apps with HTTP response headers*. Available at: https://helmetjs.github.io/ (Accessed: 4 September 2026).
 - Node.js (2025) *HTTPS*. Available at: https://nodejs.org/api/https.html (Accessed: 4 September 2026).
 - OWASP (2024) *Improper error handling*. Available at: https://owasp.org/www-community/Improper_Error_Handling (Accessed: 4 September 2026).
