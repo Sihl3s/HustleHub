@@ -1,39 +1,58 @@
-# Architecture diagram (TODO — Blessing)
+# Architecture diagram — Blessing
 
-Part 1 requires an architecture diagram of the overall HustleHub+ system. The diagram must reflect the **MERN** architecture and must show security features and system boundaries.
+Part 1 requires a MERN architecture diagram with security features and system boundaries.
 
-Insert the finished diagram in the project README (export a PNG/SVG or use a Mermaid figure). This file is only a checklist of what the diagram should include.
+Save your exported PNG as `docs/images/architecture-diagram.png`, then add this line to the README:
 
-## Components to show
-
-- **Client devices** — browser users (Clients, Freelancers, Admin)
-- **React frontend** (later POE parts) — user interface
-- **HTTPS / TLS boundary** — all traffic to the API is encrypted
-- **Node.js + Express API** — registration, login, protected routes
-- **Security controls inside the API**
-  - Input validation and sanitisation
-  - Password hashing (no plain-text passwords)
-  - JWT generation and validation middleware
-  - Controlled error responses (no stack traces)
-  - Event logging (no secrets in logs)
-- **User store**
-  - Part 1: local file-based storage
-  - Later parts: MongoDB
-- **System boundary** — what sits inside HustleHub+ versus external users/clients
-
-## Suggested layout
-
-```text
-[ Browser / React client ]
-            |
-         HTTPS
-            |
-[ Express API + Helmet + validation + JWT middleware ]
-            |
-     ---------------
-     |             |
-[ File store ]  [ MongoDB — later ]
-[ Part 1     ]
+```markdown
+![HustleHub+ Architecture Diagram](docs/images/architecture-diagram.png)
 ```
 
-Replace the sketch with a clear diagram (draw.io, Mermaid, or similar) before submission.
+You can screenshot the Mermaid diagram below (GitHub also renders it) and tidy it in draw.io if you prefer.
+
+```mermaid
+flowchart TB
+  subgraph outside [Outside the system boundary]
+    Users[Clients Freelancers Admins]
+    Devices[Browser devices]
+  end
+
+  subgraph hustlehub [HustleHub+ system boundary]
+    subgraph later [Later POE parts]
+      ReactUI[React frontend]
+      Mongo[(MongoDB)]
+    end
+
+    subgraph part1 [Part 1 now]
+      TLS[HTTPS TLS]
+      subgraph api [Node.js Express API]
+        Helmet[Helmet headers]
+        Validate[Input validation]
+        Hash[Password hashing bcrypt]
+        JWT[JWT sign and verify]
+        Errors[Safe error handler]
+        Logs[Event logging]
+      end
+      Files[(File user store)]
+    end
+  end
+
+  Users --> Devices
+  Devices --> ReactUI
+  Devices -->|"Part 1: Postman or HTTPS client"| TLS
+  ReactUI -->|"Later parts"| TLS
+  TLS --> Helmet --> Validate --> Hash
+  Validate --> JWT
+  Hash --> Files
+  JWT --> Files
+  Files -.->|"Later parts"| Mongo
+  api --> Errors
+  api --> Logs
+```
+
+## Must show
+
+- React (later), Express + Node, MongoDB (later)
+- HTTPS boundary
+- Validation, hashing, JWT, controlled errors
+- Part 1 file storage vs later MongoDB

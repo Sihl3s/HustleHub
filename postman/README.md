@@ -1,52 +1,34 @@
-# Postman collection — TODO (Thami)
+# Postman collection — Thami
 
-Part 1 must include a Postman collection that shows successful registration and login, plus invalid scenarios. Screenshots of API responses and a demonstration video are also required.
+A ready-made collection is in this folder:
 
-Do not commit secrets. Use the local HTTPS URL and the JWT returned by login.
+`postman/HustleHub.postman_collection.json`
 
-## Base URL
+## What you still need to do
 
-`https://127.0.0.1:3443`
+1. `git pull` so you have the latest `main`.
+2. Start the API (`cd backend`, copy `.env.example` to `.env`, set `JWT_SECRET`, `npm install`, `npm run generate-certs`, `npm start`).
+3. Open Postman → **Import** → choose `HustleHub.postman_collection.json`.
+4. File → Settings → **SSL certificate verification = OFF**.
+5. Send the 8 requests **in order** (1 → 8).
+6. Screenshot:
+   - successful register (201) and login (200), including the token
+   - invalid/unauthorised responses (400, 409, 401)
+7. Record the demo video: API running over HTTPS → register → login showing the token.
+8. If you edit the collection, export it back into this folder and push.
+9. Add the video link where the team is submitting.
 
-In Postman: Settings → turn **SSL certificate verification** off for this local self-signed certificate.
+## Expected results
 
-## Requests to include
+| Request | Status |
+| --- | --- |
+| GET /health | 200 |
+| POST /api/auth/register (valid) | 201 + token |
+| POST /api/auth/register (invalid) | 400 |
+| POST /api/auth/register (same email again) | 409 |
+| POST /api/auth/login (valid) | 200 + token |
+| POST /api/auth/login (wrong password) | 401 |
+| GET /api/me (Bearer token) | 200 |
+| GET /api/me (no token) | 401 |
 
-Save the collection as `postman/HustleHub.postman_collection.json` in this folder.
-
-1. `GET /health` — API is running over HTTPS (200).
-2. `POST /api/auth/register` — valid body, expect 201 and a JWT.
-3. `POST /api/auth/register` — missing fields / invalid email / short password (400).
-4. `POST /api/auth/register` — duplicate email (409).
-5. `POST /api/auth/login` — valid credentials, expect 200 and a JWT.
-6. `POST /api/auth/login` — wrong password or unknown email (401, same generic message).
-7. `GET /api/me` — `Authorization: Bearer <token>` (200).
-8. `GET /api/me` — missing or invalid token (401).
-
-### Example register body
-
-```json
-{
-  "email": "freelancer@example.com",
-  "password": "Str0ngPass!",
-  "fullName": "Ada Freelancer",
-  "role": "freelancer"
-}
-```
-
-### Example login body
-
-```json
-{
-  "email": "freelancer@example.com",
-  "password": "Str0ngPass!"
-}
-```
-
-## Submission checklist
-
-- [ ] Postman collection exported into this folder
-- [ ] Screenshots of successful register and login (including the token)
-- [ ] Screenshots of invalid/unauthorised responses
-- [ ] Demonstration video: API running over HTTPS, successful registration, login with token generation
-- [ ] Video link added where the team agrees to submit it (README or submission form)
+If register success returns 409, that email is already in `backend/data/users.json`. Use a new email or delete that JSON file (keep the `data` folder).
