@@ -1,0 +1,190 @@
+{
+  "info": {
+    "_postman_id": "a3c1e8f0-7b2d-4c91-9f14-hustlehub-part1",
+    "name": "HustleHub+ Part 1 API",
+    "description": "Part 1 API tests for HustleHub+.\n\nBefore you send requests:\n1. Start the API (`cd backend` then `npm start`). It must be on https://127.0.0.1:3443\n2. In Postman: File → Settings → SSL certificate verification = OFF (self-signed cert)\n3. Run the requests **in order**. Register success saves the JWT into the `token` collection variable for /api/me.\n\nThen screenshot the successes and failures, export this collection into this folder if you change it, and record the demo video.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://127.0.0.1:3443"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health",
+        "description": "Expect HTTP 200 and {\"status\":\"ok\"}."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Register success (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const body = pm.response.json();",
+              "  if (body.token) {",
+              "    pm.collectionVariables.set('token', body.token);",
+              "  }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"Str0ngPass!\",\n  \"fullName\": \"Ada Freelancer\",\n  \"role\": \"freelancer\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/register",
+        "description": "Expect HTTP 201 with a token. If this email already exists, you will get 409 — use a new email or delete backend/data/users.json (keep the folder)."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Register invalid (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"short\",\n  \"fullName\": \"A\",\n  \"role\": \"nope\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/register",
+        "description": "Expect HTTP 400 Invalid request data."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Register duplicate (409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"Str0ngPass!\",\n  \"fullName\": \"Ada Freelancer\",\n  \"role\": \"freelancer\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/register",
+        "description": "Run request 2 first. Expect HTTP 409 An account with this email already exists."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Login success (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  const body = pm.response.json();",
+              "  if (body.token) {",
+              "    pm.collectionVariables.set('token', body.token);",
+              "  }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"Str0ngPass!\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login",
+        "description": "Expect HTTP 200 and a token. The token is saved for request 7."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Login invalid (401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freelancer@example.com\",\n  \"password\": \"WrongPass!\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login",
+        "description": "Expect HTTP 401 Invalid email or password."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Get me with token (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/me",
+        "description": "Run login success first. Expect HTTP 200 with the user object."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get me without token (401)",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/me",
+        "description": "Expect HTTP 401 Authentication required."
+      },
+      "response": []
+    }
+  ]
+}

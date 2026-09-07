@@ -54,7 +54,9 @@ Replace the headings below with the written explanations required for Part 1. In
 
 ### Architecture diagram (MERN)
 
-<!-- Insert the architecture diagram here. It must show MERN components, security features, and system boundaries. A placeholder outline lives in docs/architecture.md. -->
+<!-- Put the PNG in docs/images/architecture-diagram.png then uncomment the next line. A Mermaid starter is in docs/architecture.md. -->
+
+<!-- ![HustleHub+ Architecture Diagram](docs/images/architecture-diagram.png) -->
 
 ### Security decisions
 
@@ -84,5 +86,5 @@ Replace the headings below with the written explanations required for Part 1. In
 
 | Member | Role | Still to complete |
 | --- | --- | --- |
-| Blessing | Architecture | Complete the README sections above and add the MERN architecture diagram. |
-| Thami | Testing | Build the Postman collection, capture API screenshots, record the demonstration video, and tick off the checklist in [postman/README.md](postman/README.md). |
+| Blessing | Architecture | Fill the README sections above, paste [docs/REFERENCES.md](docs/REFERENCES.md) into References, and add the diagram PNG (starter in [docs/architecture.md](docs/architecture.md)). |
+| Thami | Testing | Import [postman/HustleHub.postman_collection.json](postman/HustleHub.postman_collection.json), run the 8 requests, take screenshots, and record the demo video. |
