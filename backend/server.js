@@ -8,9 +8,9 @@
 
 const fs = require('fs');
 const https = require('https');
-const { loadEnv } = require('./config/env');
-const { logEvent } = require('./utils/logger');
-const app = require('./app');
+const { loadEnv } = require('./src/config/env');
+const { logEvent } = require('./src/utils/logger');
+const app = require('./src/app');
 
 function readCertFiles(env) {
   if (!fs.existsSync(env.certKeyPath) || !fs.existsSync(env.certPath)) {
