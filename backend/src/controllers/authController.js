@@ -6,10 +6,11 @@ const { logEvent } = require('../utils/logger');
 
 function toPublicUser(user) {
   return {
+    id: user.id,
     email: user.email,
-    password: user.password,
     fullName: user.fullName,
     role: user.role,
+    createdAt: user.createdAt,
   };
 }
 
@@ -24,7 +25,14 @@ async function register(req, res, next) {
     }
 
     const passwordHash = await hashPassword(password);
-    const user = await createUser({ email, fullName, role, passwordHash });
+
+    const user = await createUser({
+      email,
+      fullName,
+      role: role || 'user',
+      passwordHash,
+    });
+    //const user = await createUser({ email, fullName, role, passwordHash });
     const token = signAccessToken(user);
 
     logEvent('info', 'register_success', { userId: user.id, role: user.role });

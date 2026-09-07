@@ -1,0 +1,10 @@
+$kind: http-request
+name: https://127.0.0.1:3443/api/me
+description: ""
+url: https://127.0.0.1:3443/api/me
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_0dd2}}"
+order: 4273490695726825
