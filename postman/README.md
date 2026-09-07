@@ -15,7 +15,7 @@ In Postman: Settings → turn **SSL certificate verification** off for this loca
 Save the collection as `postman/HustleHub.postman_collection.json` in this folder.
 
 1. `GET /health` — API is running over HTTPS (200).
-2. `POST /api/auth/register` — valid body, expect 201 and a JWT (after Lesedi finishes hashing and storage).
+2. `POST /api/auth/register` — valid body, expect 201 and a JWT.
 3. `POST /api/auth/register` — missing fields / invalid email / short password (400).
 4. `POST /api/auth/register` — duplicate email (409).
 5. `POST /api/auth/login` — valid credentials, expect 200 and a JWT.

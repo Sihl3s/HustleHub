@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "generate-certs": "node scripts/generate-certs.js"
+    "generate-certs": "node scripts/generate-certs.js",
+    "test": "jest --testPathPattern=tests"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -28,5 +29,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "selfsigned": "^2.4.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

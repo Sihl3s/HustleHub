@@ -7,7 +7,7 @@ describe('Password Utility Functions', () => {
 
     expect(hash).toBeDefined();
     expect(typeof hash).toBe('string');
-    expect(hash).not.toBe(plainPassword); // Ensure the hash is not the same as the plain password
+    expect(hash).not.toBe(plainPassword);
   });
 
   test('verifyPassword should return true for matching password and hash', async () => {
@@ -26,4 +26,4 @@ describe('Password Utility Functions', () => {
     const isMatch = await verifyPassword(wrongPassword, hash);
     expect(isMatch).toBe(false);
   });
-   });
+});

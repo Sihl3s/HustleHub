@@ -1,29 +1,15 @@
 /**
- * TODO(Lesedi): implement password hashing with bcrypt.
+ * Password hashing helpers.
  *
- * Passwords must never be stored or compared in plain text. Use a slow,
- * salted algorithm such as bcrypt with a work factor of at least 10
- * (OWASP, 2025d; Grassi et al., 2017).
- *
- * Suggested package (already listed in package.json):
- *   const bcrypt = require('bcryptjs');
- *
- * hashPassword:
- *   - accept the plain password string from the validated request
- *   - return the bcrypt hash only (never log or return the plain password)
- *   - use bcrypt.hash(plainPassword, 12) or similar cost >= 10
- *
- * verifyPassword:
- *   - compare a login attempt against the stored hash with bcrypt.compare
- *   - return true or false
- *   - use bcrypt.compare (do not write == yourself)
+ * Passwords must never be stored or compared in plain text. bcrypt is a slow,
+ * salted algorithm; a work factor of 12 meets the minimum of 10 recommended
+ * for bcrypt (OWASP, 2025d; Grassi et al., 2017).
  */
 
+const bcrypt = require('bcryptjs');
 const { AppError } = require('./appError');
 
-function notImplemented(feature) {
-  return new AppError(`${feature} is not implemented yet`, 501);
-}
+const BCRYPT_ROUNDS = 12;
 
 /**
  * Hashes a plain-text password for storage.
@@ -36,7 +22,7 @@ async function hashPassword(plainPassword) {
     throw new AppError('Password is required', 400);
   }
 
-  throw notImplemented('Password hashing');
+  return bcrypt.hash(plainPassword, BCRYPT_ROUNDS);
 }
 
 /**
@@ -51,7 +37,7 @@ async function verifyPassword(plainPassword, passwordHash) {
     return false;
   }
 
-  throw notImplemented('Password verification');
+  return bcrypt.compare(plainPassword, passwordHash);
 }
 
 module.exports = {
