@@ -16,7 +16,7 @@ A ready-made collection is in this folder:
    - invalid/unauthorised responses (400, 409, 401)
 7. Record the demo video: API running over HTTPS → register → login showing the token.
 8. If you edit the collection, export it back into this folder and push.
-9. Add the video link where the team is submitting.
+9. The demo video is linked in the root README: https://youtu.be/ZT6XeQMRhIE
 
 ## Expected results
 

@@ -27,6 +27,7 @@ Because HustleHub+ handles sensitive information such as **user credentials, tra
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
+- [Demo Video](#-demo-video)
 - [Authors](#-authors)
 
 ---
@@ -398,6 +399,14 @@ The API listens on https://127.0.0.1:3443.
 - Login: POST https://127.0.0.1:3443/api/auth/login
 - Current user (JWT required): GET https://127.0.0.1:3443/api/me
 - The TLS certificate is self-signed. In Postman, turn off SSL certificate verification for local requests.
+
+---
+
+# Demo Video
+
+The Part 1 demonstration of the HTTPS API (health check, register, login, and the protected current-user route) is on YouTube:
+
+https://youtu.be/ZT6XeQMRhIE
 
 ---
 
