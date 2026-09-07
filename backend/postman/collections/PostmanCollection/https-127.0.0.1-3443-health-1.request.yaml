@@ -1,0 +1,19 @@
+$kind: http-request
+name: https://127.0.0.1:3443/health
+description: ""
+url: https://127.0.0.1:3443/health
+method: GET
+body:
+  type: json
+  content: "{\r
+
+    \    \"id\":\"01\",\r
+
+    \    \"fullname\": \"joe\",\r
+
+    \    \"email\": \"joe@mail.com\",\r
+
+    \    \"role\": \"creator\"\r
+
+    }"
+order: 2937809836094247
