@@ -34,8 +34,6 @@ The API listens on `https://127.0.0.1:3443`.
 
 The TLS certificate is self-signed. In Postman, turn off SSL certificate verification for local requests.
 
-Until Lesedi completes password hashing and the user store, register and login return HTTP 501.
-
 ---
 
 ## TODO — Blessing (Architecture Lead)
@@ -86,6 +84,5 @@ Replace the headings below with the written explanations required for Part 1. In
 
 | Member | Role | Still to complete |
 | --- | --- | --- |
-| Lesedi | Backend / Authorisation | Implement `backend/src/utils/password.js` (bcrypt hash and verify) and `backend/src/models/userStore.js` (file-based user storage). Function names and comments are already in those files. |
 | Blessing | Architecture | Complete the README sections above and add the MERN architecture diagram. |
 | Thami | Testing | Build the Postman collection, capture API screenshots, record the demonstration video, and tick off the checklist in [postman/README.md](postman/README.md). |
