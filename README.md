@@ -27,6 +27,10 @@ Because HustleHub+ handles sensitive information such as **user credentials, tra
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
+<<<<<<< HEAD
+=======
+- [Demo Video](#-demo-video)
+>>>>>>> d8eddc1c9109e2f6b208e601df4d692a6fda0a2c
 - [Authors](#-authors)
 
 ---
@@ -401,6 +405,17 @@ The API listens on https://127.0.0.1:3443.
 
 ---
 
+<<<<<<< HEAD
+=======
+# Demo Video
+
+The Part 1 demonstration of the HTTPS API (health check, register, login, and the protected current-user route) is on YouTube:
+
+https://youtu.be/ZT6XeQMRhIE
+
+---
+
+>>>>>>> d8eddc1c9109e2f6b208e601df4d692a6fda0a2c
 # Security References
 
 The security design of Hustle Hub+ was informed by established security guidance and standards, including:

@@ -1,0 +1,15 @@
+$kind: http-request
+name: https://127.0.0.1:3443/api/auth/login
+description: ""
+url: https://127.0.0.1:3443/api/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\":\"thami@gmail.com\",\r
+
+    \    \"password\":\"password123!\"\r
+
+    }"
+order: 4261449442005092
