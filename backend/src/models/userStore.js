@@ -1,54 +1,32 @@
 /**
- * Part 1 user store (file-based JSON).
+ * User persistence (MongoDB via Mongoose).
  *
- * A database is not required until a later POE part. Users are persisted in
- * backend/data/users.json (gitignored). Only the hash from hashPassword is
- * stored — never the plain-text password (OWASP, 2025d).
+ * Returns plain objects with an `id` string and, for lookups used by login,
+ * the passwordHash. Controllers strip the hash before responding
+ * (OWASP, 2025d).
  */
 
-const fs = require('fs/promises');
-const path = require('path');
-const crypto = require('crypto');
+const mongoose = require('mongoose');
+const User = require('./User');
 const { AppError } = require('../utils/appError');
 
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-
-async function ensureStore() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-
-  try {
-    await fs.access(USERS_FILE);
-  } catch {
-    await fs.writeFile(USERS_FILE, '[]', 'utf8');
+function toRecord(doc) {
+  if (!doc) {
+    return null;
   }
-}
 
-async function readUsers() {
-  await ensureStore();
-  const raw = await fs.readFile(USERS_FILE, 'utf8');
-
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    throw new AppError('User store could not be read', 500);
-  }
-}
-
-async function writeUsers(users) {
-  await ensureStore();
-  const tempFile = `${USERS_FILE}.tmp`;
-  await fs.writeFile(tempFile, `${JSON.stringify(users, null, 2)}\n`, 'utf8');
-  await fs.rename(tempFile, USERS_FILE);
-}
-
-function normaliseEmail(email) {
-  return String(email).trim().toLowerCase();
+  return {
+    id: doc._id.toString(),
+    email: doc.email,
+    fullName: doc.fullName,
+    role: doc.role,
+    passwordHash: doc.passwordHash,
+    createdAt: doc.createdAt.toISOString(),
+  };
 }
 
 /**
- * Finds a stored user by email.
+ * Finds a stored user by email (case-insensitive; emails are stored lower-case).
  *
  * @param {string} email
  * @returns {Promise<object|null>}
@@ -58,9 +36,19 @@ async function findByEmail(email) {
     return null;
   }
 
-  const needle = normaliseEmail(email);
-  const users = await readUsers();
-  return users.find((user) => normaliseEmail(user.email) === needle) || null;
+  return toRecord(await User.findOne({ email: email.trim().toLowerCase() }));
+}
+
+/**
+ * @param {string} id
+ * @returns {Promise<object|null>}
+ */
+async function findById(id) {
+  if (typeof id !== 'string' || !mongoose.isValidObjectId(id)) {
+    return null;
+  }
+
+  return toRecord(await User.findById(id));
 }
 
 /**
@@ -74,22 +62,20 @@ async function createUser(userInput) {
     throw new AppError('User record is incomplete', 400);
   }
 
-  const users = await readUsers();
-  const user = {
-    id: crypto.randomUUID(),
-    email: normaliseEmail(userInput.email),
-    fullName: userInput.fullName,
-    role: userInput.role,
-    passwordHash: userInput.passwordHash,
-    createdAt: new Date().toISOString(),
-  };
+  const { email, fullName, role, passwordHash } = userInput;
 
-  users.push(user);
-  await writeUsers(users);
-  return user;
+  try {
+    return toRecord(await User.create({ email, fullName, role, passwordHash }));
+  } catch (err) {
+    if (err && err.code === 11000) {
+      throw new AppError('An account with this email already exists', 409);
+    }
+    throw err;
+  }
 }
 
 module.exports = {
   findByEmail,
+  findById,
   createUser,
 };

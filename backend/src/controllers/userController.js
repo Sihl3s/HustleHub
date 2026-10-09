@@ -1,9 +1,9 @@
 const { AppError } = require('../utils/appError');
-const { findByEmail } = require('../models/userStore');
+const { findById } = require('../models/userStore');
 
 async function getUser(req, res, next) {
   try {
-    const user = await findByEmail(req.user.email);
+    const user = await findById(req.user.id);
 
     if (!user) {
       throw new AppError('User not found', 404);

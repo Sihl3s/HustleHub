@@ -9,6 +9,8 @@
 const { body } = require('express-validator');
 
 const ROLES = ['client', 'freelancer', 'admin'];
+// Admin accounts cannot be self-registered (privilege escalation); they are seeded.
+const REGISTERABLE_ROLES = ['client', 'freelancer'];
 
 const registerValidators = [
   body('email')
@@ -28,8 +30,8 @@ const registerValidators = [
     .escape(),
   body('role')
     .isString()
-    .isIn(ROLES)
-    .withMessage(`Role must be one of: ${ROLES.join(', ')}`),
+    .isIn(REGISTERABLE_ROLES)
+    .withMessage(`Role must be one of: ${REGISTERABLE_ROLES.join(', ')}`),
 ];
 
 const loginValidators = [
