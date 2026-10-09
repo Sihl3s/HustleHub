@@ -1,15 +1,15 @@
 /**
- * Password hashing helpers.
+ * Password hashing with bcrypt.
  *
- * Passwords must never be stored or compared in plain text. bcrypt is a slow,
- * salted algorithm; a work factor of 12 meets the minimum of 10 recommended
- * for bcrypt (OWASP, 2025d; Grassi et al., 2017).
+ * Passwords are never stored or compared in plain text. bcrypt is a slow,
+ * salted algorithm, so stolen hashes are expensive to brute-force
+ * (OWASP, 2025d; Grassi et al., 2017).
  */
 
 const bcrypt = require('bcryptjs');
 const { AppError } = require('./appError');
 
-const BCRYPT_ROUNDS = 12;
+const SALT_ROUNDS = 12;
 
 /**
  * Hashes a plain-text password for storage.
@@ -22,7 +22,7 @@ async function hashPassword(plainPassword) {
     throw new AppError('Password is required', 400);
   }
 
-  return bcrypt.hash(plainPassword, BCRYPT_ROUNDS);
+  return bcrypt.hash(plainPassword, SALT_ROUNDS);
 }
 
 /**

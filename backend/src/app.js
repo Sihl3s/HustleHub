@@ -16,6 +16,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
 const meRoutes = require('./routes/me');
+const gigRoutes = require('./routes/gigs');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/auth', authLimiter);
 app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/me', meRoutes);
+app.use('/api/gigs', gigRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

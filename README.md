@@ -1,4 +1,4 @@
-# HustleHub+
+﻿# HustleHub+
 
 ## A Freelance Marketplace Platform
 
@@ -27,10 +27,6 @@ Because HustleHub+ handles sensitive information such as **user credentials, tra
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
-<<<<<<< HEAD
-=======
-- [Demo Video](#-demo-video)
->>>>>>> d8eddc1c9109e2f6b208e601df4d692a6fda0a2c
 - [Authors](#-authors)
 
 ---
@@ -308,6 +304,21 @@ This is expected when running the application locally.
 
 For production deployment, a certificate issued by a trusted Certificate Authority should be used.
 
+**MongoDB:** users and gigs are stored in MongoDB (default `mongodb://127.0.0.1:27017/hustlehub`; set `MONGODB_URI` in `.env`). Start `mongod` before `npm start`. Run the tests with `npm test` (they use an in-memory MongoDB).
+
+### Gig endpoints (JWT required)
+
+| Method | Path | Who | Notes |
+|---|---|---|---|
+| GET | `/api/gigs` | any user | active gigs; `?category=&search=&page=&limit=` |
+| GET | `/api/gigs/mine` | freelancer | own gigs, including inactive |
+| GET | `/api/gigs/:id` | any user | inactive gigs only visible to the owner |
+| POST | `/api/gigs` | freelancer | owner is taken from the JWT |
+| PUT | `/api/gigs/:id` | owning freelancer | partial update; 403 if not the owner |
+| DELETE | `/api/gigs/:id` | owning freelancer | 403 if not the owner |
+
+Admin accounts cannot be self-registered; `role` must be `client` or `freelancer`.
+
 ---
 
 ## Security Headers
@@ -405,17 +416,6 @@ The API listens on https://127.0.0.1:3443.
 
 ---
 
-<<<<<<< HEAD
-=======
-# Demo Video
-
-The Part 1 demonstration of the HTTPS API (health check, register, login, and the protected current-user route) is on YouTube:
-
-https://youtu.be/ZT6XeQMRhIE
-
----
-
->>>>>>> d8eddc1c9109e2f6b208e601df4d692a6fda0a2c
 # Security References
 
 The security design of Hustle Hub+ was informed by established security guidance and standards, including:
