@@ -4,8 +4,8 @@
   "description": "HustleHub+ secure freelance marketplace API (Part 1: authentication foundations)",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "generate-certs": "node scripts/generate-certs.js",
     "test": "jest --testPathPattern=tests"
   },
