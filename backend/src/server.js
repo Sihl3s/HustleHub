@@ -9,6 +9,7 @@
 const fs = require('fs');
 const https = require('https');
 const { loadEnv } = require('./config/env');
+const { connectDb } = require('./config/db');
 const { logEvent } = require('./utils/logger');
 const app = require('./app');
 
@@ -25,9 +26,11 @@ function readCertFiles(env) {
   };
 }
 
-function start() {
+async function start() {
   const env = loadEnv();
   const tlsOptions = readCertFiles(env);
+
+  await connectDb(env.mongoUri);
 
   const server = https.createServer(tlsOptions, app);
 
@@ -42,4 +45,7 @@ function start() {
   });
 }
 
-start();
+start().catch((err) => {
+  logEvent('error', 'startup_failed', { message: err.message });
+  process.exit(1);
+});
