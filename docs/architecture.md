@@ -1,58 +1,70 @@
-# Architecture diagram — Blessing
+# HustleHub+ architecture (Part 2)
 
-Part 1 requires a MERN architecture diagram with security features and system boundaries.
-
-Save your exported PNG as `docs/images/architecture-diagram.png`, then add this line to the README:
-
-```markdown
-![HustleHub+ Architecture Diagram](docs/images/architecture-diagram.png)
-```
-
-You can screenshot the Mermaid diagram below (GitHub also renders it) and tidy it in draw.io if you prefer.
+The MERN system with its security controls and system boundaries. GitHub renders this diagram directly; export it to `docs/images/architecture-diagram.png` if the README image needs refreshing.
 
 ```mermaid
 flowchart TB
-  subgraph outside [Outside the system boundary]
-    Users[Clients Freelancers Admins]
-    Devices[Browser devices]
+  subgraph outside [Outside the system boundary - untrusted]
+    Users[Clients, freelancers, admins]
+    Browser[Web browser]
+    Tools[Postman / Newman]
   end
 
   subgraph hustlehub [HustleHub+ system boundary]
-    subgraph later [Later POE parts]
-      ReactUI[React frontend]
-      Mongo[(MongoDB)]
+    subgraph frontend [React frontend - Vite]
+      UI[Auth, browse, gig management, booking screens]
+      CSP[CSP and security headers]
+      Session[JWT in sessionStorage]
     end
 
-    subgraph part1 [Part 1 now]
-      TLS[HTTPS TLS]
-      subgraph api [Node.js Express API]
-        Helmet[Helmet headers]
-        Validate[Input validation]
-        Hash[Password hashing bcrypt]
-        JWT[JWT sign and verify]
-        Errors[Safe error handler]
-        Logs[Event logging]
-      end
-      Files[(File user store)]
+    TLS[HTTPS / TLS]
+
+    subgraph api [Node.js + Express API]
+      Helmet[Helmet: CSP, frameguard, nosniff, no-store]
+      Limits[Rate limiting: API, auth, booking, gig writes]
+      Sanitise[Sanitisation: NoSQL operators, prototype keys, JSON only]
+      Validate[express-validator: types, lengths, escaping, unknown fields]
+      Authn[JWT verify: HS256, issuer, audience, expiry]
+      Rbac[RBAC: client, freelancer, admin]
+      Owner[Ownership checks on gigs and bookings]
+      Ctrl[Controllers: auth, gigs, bookings, transactions, income]
+      Errors[Safe error handler]
+      Logs[Security event logging]
+    end
+
+    subgraph db [MongoDB]
+      UsersCol[(users - bcrypt hashes)]
+      Gigs[(gigs)]
+      Bookings[(bookings)]
+      Txns[(transactions)]
     end
   end
 
-  Users --> Devices
-  Devices --> ReactUI
-  Devices -->|"Part 1: Postman or HTTPS client"| TLS
-  ReactUI -->|"Later parts"| TLS
-  TLS --> Helmet --> Validate --> Hash
-  Validate --> JWT
-  Hash --> Files
-  JWT --> Files
-  Files -.->|"Later parts"| Mongo
-  api --> Errors
-  api --> Logs
+  Users --> Browser --> UI
+  UI --> CSP
+  UI -->|"same-origin /api proxy"| TLS
+  Tools --> TLS
+  TLS --> Helmet --> Limits --> Sanitise --> Validate --> Authn --> Rbac --> Owner --> Ctrl
+  Ctrl --> UsersCol
+  Ctrl --> Gigs
+  Ctrl --> Bookings
+  Ctrl --> Txns
+  Ctrl --> Errors
+  Ctrl --> Logs
 ```
 
-## Must show
+## Booking flow
 
-- React (later), Express + Node, MongoDB (later)
-- HTTPS boundary
-- Validation, hashing, JWT, controlled errors
-- Part 1 file storage vs later MongoDB
+```mermaid
+sequenceDiagram
+  participant C as Client (React)
+  participant A as Express API
+  participant M as MongoDB
+  C->>A: POST /api/bookings {gigId, notes} + Bearer JWT
+  A->>A: booking rate limit, JWT verify, role = client, validate + escape
+  A->>M: find gig (must be active)
+  A->>M: create booking (price and freelancer from the gig)
+  A->>M: create transaction (client, freelancer, gig, booking, amount)
+  A-->>C: 201 confirmed, reference HH-XXXXXXXX
+  Note over A,M: Freelancer later reads GET /api/bookings/mine and GET /api/transactions/income
+```

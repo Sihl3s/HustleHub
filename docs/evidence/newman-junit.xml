@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="HustleHub+ Part 2 API" tests="40" time="4.017">
+  <testsuite name="1. Authentication / Health check (200)" id="f4bb4934-4e64-4431-8f26-18024582e94e" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.080">
+    <testcase name="Status is 200" time="0.080" classname="1AuthenticationHealthCheck200"/>
+    <testcase name="API is up" time="0.080" classname="1AuthenticationHealthCheck200"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register freelancer (201)" id="9f718770-c5d8-407c-a4c9-21e2e1469d78" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.567">
+    <testcase name="Status is 201" time="0.567" classname="1AuthenticationRegisterFreelancer201"/>
+    <testcase name="Returns a JWT and no password hash" time="0.567" classname="1AuthenticationRegisterFreelancer201"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register second freelancer (201)" id="f6a17358-d750-45f6-8f3f-7a23f95c0d1b" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.461">
+    <testcase name="Status is 201" time="0.461" classname="1AuthenticationRegisterSecondFreelancer201"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register client (201)" id="95d73459-fa79-4906-aec1-6f371d376d1d" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.423">
+    <testcase name="Status is 201" time="0.423" classname="1AuthenticationRegisterClient201"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register invalid input (400)" id="7dcca500-7731-4afc-aa0f-84f4bf7e8fe4" timestamp="2026-10-10T11:33:38.959Z" tests="3" failures="0" errors="0" time="0.020">
+    <testcase name="Status is 400" time="0.020" classname="1AuthenticationRegisterInvalidInput400"/>
+    <testcase name="Lists the invalid fields" time="0.020" classname="1AuthenticationRegisterInvalidInput400"/>
+    <testcase name="Error does not leak internals" time="0.020" classname="1AuthenticationRegisterInvalidInput400"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register duplicate email (409)" id="dc0b24a6-d910-4f22-827c-9a8095836a0a" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.033">
+    <testcase name="Status is 409" time="0.033" classname="1AuthenticationRegisterDuplicateEmail409"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Register as admin is refused (400)" id="f6c593f2-1289-4a9f-a7b1-149d377fcc27" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.015">
+    <testcase name="Status is 400" time="0.015" classname="1AuthenticationRegisterAsAdminIsRefused400"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Login success (200)" id="b309f1e8-cf6a-4bdd-9af9-af3971c2c47f" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.438">
+    <testcase name="Status is 200" time="0.438" classname="1AuthenticationLoginSuccess200"/>
+    <testcase name="Returns a JWT" time="0.438" classname="1AuthenticationLoginSuccess200"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Login wrong password (401)" id="061767b1-6842-48c5-bf75-0f4b1aa64bc9" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.598">
+    <testcase name="Status is 401" time="0.598" classname="1AuthenticationLoginWrongPassword401"/>
+    <testcase name="Generic message does not reveal which part was wrong" time="0.598" classname="1AuthenticationLoginWrongPassword401"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Get me with token (200)" id="99867841-6150-439b-9af2-aeda569a172b" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.041">
+    <testcase name="Status is 200" time="0.041" classname="1AuthenticationGetMeWithToken200"/>
+    <testcase name="Returns the logged-in user" time="0.041" classname="1AuthenticationGetMeWithToken200"/>
+  </testsuite>
+  <testsuite name="1. Authentication / Get me without token (401)" id="7d77c2a7-c6f4-4797-9880-4de51da6b5fe" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.040">
+    <testcase name="Status is 401" time="0.040" classname="1AuthenticationGetMeWithoutToken401"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Freelancer creates gig (201)" id="fdcdd288-3724-4826-a522-d77cde6ea26a" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.131">
+    <testcase name="Status is 201" time="0.131" classname="2GigsFreelancerCreatesGig201"/>
+    <testcase name="Gig is owned by the logged-in freelancer" time="0.131" classname="2GigsFreelancerCreatesGig201"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Client browses gigs (200)" id="2ade18a9-26b9-4b3a-b584-3fb65ed7e1dd" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.081">
+    <testcase name="Status is 200" time="0.081" classname="2GigsClientBrowsesGigs200"/>
+    <testcase name="Finds the new gig" time="0.081" classname="2GigsClientBrowsesGigs200"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Client views gig by id (200)" id="a0acf62f-e902-449e-928b-6ce2cc51faeb" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.040">
+    <testcase name="Status is 200" time="0.040" classname="2GigsClientViewsGigById200"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Freelancer lists own gigs (200)" id="28a06a2a-3c26-48e4-9e66-e1cdee7ae869" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.044">
+    <testcase name="Status is 200" time="0.044" classname="2GigsFreelancerListsOwnGigs200"/>
+    <testcase name="Has at least one gig" time="0.044" classname="2GigsFreelancerListsOwnGigs200"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Freelancer updates own gig (200)" id="58551060-9735-4884-b4bf-ec047fec19dd" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.052">
+    <testcase name="Status is 200" time="0.052" classname="2GigsFreelancerUpdatesOwnGig200"/>
+    <testcase name="Price updated" time="0.052" classname="2GigsFreelancerUpdatesOwnGig200"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Create gig with invalid data (400)" id="92aa441c-97b8-4cdd-8759-9be28900d189" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.024">
+    <testcase name="Status is 400" time="0.024" classname="2GigsCreateGigWithInvalidData400"/>
+    <testcase name="Error does not leak internals" time="0.024" classname="2GigsCreateGigWithInvalidData400"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Freelancer creates a gig to delete (201)" id="684b25aa-41aa-4410-9c35-e5e583355405" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.048">
+    <testcase name="Status is 201" time="0.048" classname="2GigsFreelancerCreatesAGigToDelete201"/>
+  </testsuite>
+  <testsuite name="2. Gigs / Freelancer deletes own gig (200)" id="ac812456-0e78-432c-bb5c-64ecaf1da115" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.036">
+    <testcase name="Status is 200" time="0.036" classname="2GigsFreelancerDeletesOwnGig200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Client books a gig (201)" id="ede7415b-ffe5-4d71-b491-310655ca33c7" timestamp="2026-10-10T11:33:38.959Z" tests="4" failures="0" errors="0" time="0.055">
+    <testcase name="Status is 201" time="0.055" classname="3BookingsAndTransactionsClientBooksAGig201"/>
+    <testcase name="Booking is confirmed with a reference" time="0.055" classname="3BookingsAndTransactionsClientBooksAGig201"/>
+    <testcase name="Price comes from the gig, not the client" time="0.055" classname="3BookingsAndTransactionsClientBooksAGig201"/>
+    <testcase name="A transaction was recorded for the booking" time="0.055" classname="3BookingsAndTransactionsClientBooksAGig201"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Client lists own bookings (200)" id="61403be3-0adb-4ebe-98d9-78769ed934ee" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.040">
+    <testcase name="Status is 200" time="0.040" classname="3BookingsAndTransactionsClientListsOwnBookings200"/>
+    <testcase name="Contains the booking" time="0.040" classname="3BookingsAndTransactionsClientListsOwnBookings200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Freelancer lists bookings on their gigs (200)" id="68b43f6e-0cb5-4c9e-8c8f-6a9fe7c97846" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.034">
+    <testcase name="Status is 200" time="0.034" classname="3BookingsAndTransactionsFreelancerListsBookingsOnTheirGigs200"/>
+    <testcase name="Freelancer sees the client booking" time="0.034" classname="3BookingsAndTransactionsFreelancerListsBookingsOnTheirGigs200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Client views booking by id (200)" id="9cd5dd8d-f44c-4d62-9487-5305703e86e4" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.034">
+    <testcase name="Status is 200" time="0.034" classname="3BookingsAndTransactionsClientViewsBookingById200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Client lists own transactions (200)" id="b673cb96-d78e-468a-b9ab-0de78bf1672b" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.027">
+    <testcase name="Status is 200" time="0.027" classname="3BookingsAndTransactionsClientListsOwnTransactions200"/>
+    <testcase name="Has one transaction" time="0.027" classname="3BookingsAndTransactionsClientListsOwnTransactions200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Freelancer lists own transactions (200)" id="bf6e2e27-26bb-4965-99e5-1ca3d020d40d" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.031">
+    <testcase name="Status is 200" time="0.031" classname="3BookingsAndTransactionsFreelancerListsOwnTransactions200"/>
+    <testcase name="Transaction is linked to the booking" time="0.031" classname="3BookingsAndTransactionsFreelancerListsOwnTransactions200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transactions / Freelancer income summary (200)" id="fd78a7cb-278d-4781-920a-7e8e2c134d70" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.042">
+    <testcase name="Status is 200" time="0.042" classname="3BookingsAndTransactionsFreelancerIncomeSummary200"/>
+    <testcase name="Income reflects the booking" time="0.042" classname="3BookingsAndTransactionsFreelancerIncomeSummary200"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Gigs without token (401)" id="f919d071-bc9b-4bf9-aff6-7652a25bcd0d" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.095">
+    <testcase name="Status is 401" time="0.095" classname="4SecurityAndAccessControlGigsWithoutToken401"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Tampered JWT is rejected (401)" id="3f5aa865-30f2-45cf-a89f-ccf20d034bab" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.046">
+    <testcase name="Status is 401" time="0.046" classname="4SecurityAndAccessControlTamperedJwtIsRejected401"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Client cannot create a gig (403)" id="8d8ff643-96aa-4307-a0e1-e5082956dcf3" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.040">
+    <testcase name="Status is 403" time="0.040" classname="4SecurityAndAccessControlClientCannotCreateAGig403"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Other freelancer cannot update the gig (403)" id="a5b6d24c-453b-4e86-b2cf-24b2dea873b2" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.052">
+    <testcase name="Status is 403" time="0.052" classname="4SecurityAndAccessControlOtherFreelancerCannotUpdateTheGig403"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Other freelancer cannot delete the gig (403)" id="f377d65a-34a4-445c-9eb4-f065453fff9e" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.045">
+    <testcase name="Status is 403" time="0.045" classname="4SecurityAndAccessControlOtherFreelancerCannotDeleteTheGig403"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Freelancer cannot book a gig (403)" id="9175c727-d7f5-4e5b-a98b-6cbb0139dd8d" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.037">
+    <testcase name="Status is 403" time="0.037" classname="4SecurityAndAccessControlFreelancerCannotBookAGig403"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Outsider cannot view the booking (404)" id="cacde137-4417-4aea-a242-a68443a8747f" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.044">
+    <testcase name="Status is 404" time="0.044" classname="4SecurityAndAccessControlOutsiderCannotViewTheBooking404"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Client cannot view income summary (403)" id="3e83226f-e84b-43ea-9fcf-8f55563f6f1c" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.045">
+    <testcase name="Status is 403" time="0.045" classname="4SecurityAndAccessControlClientCannotViewIncomeSummary403"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Client cannot set the booking price (400)" id="65786376-9192-48b3-9a4b-e1b95ff4e3d5" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.035">
+    <testcase name="Status is 400" time="0.035" classname="4SecurityAndAccessControlClientCannotSetTheBookingPrice400"/>
+    <testcase name="Unexpected fields are refused" time="0.035" classname="4SecurityAndAccessControlClientCannotSetTheBookingPrice400"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / NoSQL injection in login is rejected (400)" id="e4b1dd64-5e8d-4881-8b11-f0a54eca1620" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.029">
+    <testcase name="Status is 400" time="0.029" classname="4SecurityAndAccessControlNoSqlInjectionInLoginIsRejected400"/>
+    <testcase name="No token issued" time="0.029" classname="4SecurityAndAccessControlNoSqlInjectionInLoginIsRejected400"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / XSS in gig title is escaped (201)" id="3989df8f-115b-42ce-ba59-fe305378d0e2" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.034">
+    <testcase name="Status is 201" time="0.034" classname="4SecurityAndAccessControlXssInGigTitleIsEscaped201"/>
+    <testcase name="Script tags are stored escaped" time="0.034" classname="4SecurityAndAccessControlXssInGigTitleIsEscaped201"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Malformed JSON is handled safely (400)" id="6bb8a11a-b62d-4114-a47b-2c37506acb95" timestamp="2026-10-10T11:33:38.959Z" tests="2" failures="0" errors="0" time="0.037">
+    <testcase name="Status is 400" time="0.037" classname="4SecurityAndAccessControlMalformedJsonIsHandledSafely400"/>
+    <testcase name="Error does not leak internals" time="0.037" classname="4SecurityAndAccessControlMalformedJsonIsHandledSafely400"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Invalid id is rejected (400)" id="a0cc68c9-7140-454c-a1aa-c09eb9a0630f" timestamp="2026-10-10T11:33:38.959Z" tests="1" failures="0" errors="0" time="0.017">
+    <testcase name="Status is 400" time="0.017" classname="4SecurityAndAccessControlInvalidIdIsRejected400"/>
+  </testsuite>
+  <testsuite name="4. Security and access control / Security headers are present" id="b6d5e135-864a-4172-921d-e377778c70dc" timestamp="2026-10-10T11:33:38.959Z" tests="7" failures="0" errors="0" time="0.026">
+    <testcase name="Status is 200" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="Content-Security-Policy is set" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="nosniff is set" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="Framing is denied" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="Responses are not cached" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="Framework is hidden" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+    <testcase name="Rate limit headers are sent" time="0.026" classname="4SecurityAndAccessControlSecurityHeadersArePresent"/>
+  </testsuite>
+</testsuites>

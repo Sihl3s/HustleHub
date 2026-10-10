@@ -29,6 +29,8 @@ function loadEnv() {
     port: Number(process.env.PORT) || 3443,
     jwtSecret: requireJwtSecret(),
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    jwtIssuer: process.env.JWT_ISSUER || 'hustlehub-api',
+    jwtAudience: process.env.JWT_AUDIENCE || 'hustlehub-web',
     mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hustlehub',
     nodeEnv: process.env.NODE_ENV || 'development',
     certKeyPath: path.join(__dirname, '..', '..', 'certs', 'key.pem'),

@@ -18,7 +18,7 @@ function requireRole(...allowedRoles) {
       logEvent('info', 'rbac_denied', {
         userId: req.user.id,
         role: req.user.role,
-        path: req.path,
+        path: `${req.baseUrl}${req.path}`,
       });
       return next(new AppError('You do not have permission to perform this action', 403));
     }

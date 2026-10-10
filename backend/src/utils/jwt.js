@@ -2,17 +2,20 @@
  * JWT access-token helpers.
  *
  * Tokens are signed with HS256 and verified with an explicit algorithm list so
- * that algorithm confusion attacks are rejected. Every protected request must
- * present a valid token (Sheffer, Hardt and Jones, 2020; OWASP, 2025a).
+ * that algorithm confusion and "alg: none" tokens are rejected. Issuer and
+ * audience claims bind a token to this API, and the role claim must be one of
+ * the known roles. Every protected request must present a valid token
+ * (Sheffer, Hardt and Jones, 2020; OWASP, 2025a).
  */
 
 const jwt = require('jsonwebtoken');
 const { loadEnv } = require('../config/env');
 const { AppError } = require('./appError');
+const { ROLES } = require('../validators/authValidators');
 
 function getJwtOptions() {
-  const { jwtSecret, jwtExpiresIn } = loadEnv();
-  return { jwtSecret, jwtExpiresIn };
+  const { jwtSecret, jwtExpiresIn, jwtIssuer, jwtAudience } = loadEnv();
+  return { jwtSecret, jwtExpiresIn, jwtIssuer, jwtAudience };
 }
 
 /**
@@ -22,7 +25,7 @@ function getJwtOptions() {
  * @returns {string}
  */
 function signAccessToken(user) {
-  const { jwtSecret, jwtExpiresIn } = getJwtOptions();
+  const { jwtSecret, jwtExpiresIn, jwtIssuer, jwtAudience } = getJwtOptions();
 
   return jwt.sign(
     {
@@ -35,6 +38,8 @@ function signAccessToken(user) {
     {
       algorithm: 'HS256',
       expiresIn: jwtExpiresIn,
+      issuer: jwtIssuer,
+      audience: jwtAudience,
     }
   );
 }
@@ -46,12 +51,16 @@ function signAccessToken(user) {
  * @returns {{ id: string, email: string, role: string, fullName: string }}
  */
 function verifyAccessToken(token) {
-  const { jwtSecret } = getJwtOptions();
+  const { jwtSecret, jwtIssuer, jwtAudience } = getJwtOptions();
 
   try {
-    const payload = jwt.verify(token, jwtSecret, { algorithms: ['HS256'] });
+    const payload = jwt.verify(token, jwtSecret, {
+      algorithms: ['HS256'],
+      issuer: jwtIssuer,
+      audience: jwtAudience,
+    });
 
-    if (!payload || typeof payload.sub !== 'string') {
+    if (!payload || typeof payload.sub !== 'string' || !ROLES.includes(payload.role)) {
       throw new AppError('Invalid or expired token', 401);
     }
 
