@@ -14,7 +14,7 @@ function authenticate(req, res, next) {
   const header = req.headers.authorization;
 
   if (!header || typeof header !== 'string' || !header.startsWith('Bearer ')) {
-    logEvent('info', 'auth_missing_token', { path: req.path });
+    logEvent('info', 'auth_missing_token', { path: `${req.baseUrl}${req.path}` });
     return next(new AppError('Authentication required', 401));
   }
 
@@ -28,7 +28,7 @@ function authenticate(req, res, next) {
     req.user = verifyAccessToken(token);
     return next();
   } catch (err) {
-    logEvent('info', 'auth_invalid_token', { path: req.path });
+    logEvent('info', 'auth_invalid_token', { path: `${req.baseUrl}${req.path}` });
     return next(err);
   }
 }
