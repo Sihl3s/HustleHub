@@ -1,0 +1,77 @@
+{"timestamp":"2026-10-10T11:33:37.922Z","level":"info","event":"db_connected"}
+{"timestamp":"2026-10-10T11:33:39.040Z","level":"info","event":"request","method":"GET","path":"/health"}
+{"timestamp":"2026-10-10T11:33:39.150Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:39.695Z","level":"info","event":"register_success","userId":"6aca22938415beb434e06945","role":"freelancer"}
+{"timestamp":"2026-10-10T11:33:39.803Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:40.251Z","level":"info","event":"register_success","userId":"6aca22948415beb434e06948","role":"freelancer"}
+{"timestamp":"2026-10-10T11:33:40.350Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:40.759Z","level":"info","event":"register_success","userId":"6aca22948415beb434e0694b","role":"client"}
+{"timestamp":"2026-10-10T11:33:40.864Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:40.973Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:40.986Z","level":"info","event":"register_duplicate_email"}
+{"timestamp":"2026-10-10T11:33:40.994Z","level":"error","event":"request_failed","method":"POST","path":"/api/auth/register","statusCode":409,"message":"An account with this email already exists"}
+{"timestamp":"2026-10-10T11:33:41.099Z","level":"info","event":"request","method":"POST","path":"/api/auth/register"}
+{"timestamp":"2026-10-10T11:33:41.192Z","level":"info","event":"request","method":"POST","path":"/api/auth/login"}
+{"timestamp":"2026-10-10T11:33:41.616Z","level":"info","event":"login_success","userId":"6aca22938415beb434e06945","role":"freelancer"}
+{"timestamp":"2026-10-10T11:33:41.721Z","level":"info","event":"request","method":"POST","path":"/api/auth/login"}
+{"timestamp":"2026-10-10T11:33:42.288Z","level":"info","event":"login_failed"}
+{"timestamp":"2026-10-10T11:33:42.301Z","level":"error","event":"request_failed","method":"POST","path":"/api/auth/login","statusCode":401,"message":"Invalid email or password"}
+{"timestamp":"2026-10-10T11:33:42.429Z","level":"info","event":"request","method":"GET","path":"/api/me"}
+{"timestamp":"2026-10-10T11:33:42.578Z","level":"info","event":"request","method":"GET","path":"/api/me"}
+{"timestamp":"2026-10-10T11:33:42.587Z","level":"info","event":"auth_missing_token","path":"/api/me/"}
+{"timestamp":"2026-10-10T11:33:42.598Z","level":"error","event":"request_failed","method":"GET","path":"/api/me","statusCode":401,"message":"Authentication required"}
+{"timestamp":"2026-10-10T11:33:42.705Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:42.805Z","level":"info","event":"gig_created","userId":"6aca22938415beb434e06945","gigId":"6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:42.938Z","level":"info","event":"request","method":"GET","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:43.106Z","level":"info","event":"request","method":"GET","path":"/api/gigs/6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:43.232Z","level":"info","event":"request","method":"GET","path":"/api/gigs/mine"}
+{"timestamp":"2026-10-10T11:33:43.386Z","level":"info","event":"request","method":"PUT","path":"/api/gigs/6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:43.424Z","level":"info","event":"gig_updated","userId":"6aca22938415beb434e06945","gigId":"6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:43.512Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:43.620Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:43.650Z","level":"info","event":"gig_created","userId":"6aca22938415beb434e06945","gigId":"6aca22978415beb434e0695f"}
+{"timestamp":"2026-10-10T11:33:43.751Z","level":"info","event":"request","method":"DELETE","path":"/api/gigs/6aca22978415beb434e0695f"}
+{"timestamp":"2026-10-10T11:33:43.772Z","level":"info","event":"gig_deleted","userId":"6aca22938415beb434e06945","gigId":"6aca22978415beb434e0695f"}
+{"timestamp":"2026-10-10T11:33:43.870Z","level":"info","event":"request","method":"POST","path":"/api/bookings"}
+{"timestamp":"2026-10-10T11:33:43.910Z","level":"info","event":"booking_created","userId":"6aca22948415beb434e0694b","bookingId":"6aca22978415beb434e06967","gigId":"6aca22968415beb434e06951","transactionId":"6aca22978415beb434e06969"}
+{"timestamp":"2026-10-10T11:33:44.023Z","level":"info","event":"request","method":"GET","path":"/api/bookings/mine"}
+{"timestamp":"2026-10-10T11:33:44.132Z","level":"info","event":"request","method":"GET","path":"/api/bookings/mine"}
+{"timestamp":"2026-10-10T11:33:44.240Z","level":"info","event":"request","method":"GET","path":"/api/bookings/6aca22978415beb434e06967"}
+{"timestamp":"2026-10-10T11:33:44.346Z","level":"info","event":"request","method":"GET","path":"/api/transactions/mine"}
+{"timestamp":"2026-10-10T11:33:44.473Z","level":"info","event":"request","method":"GET","path":"/api/transactions/mine"}
+{"timestamp":"2026-10-10T11:33:44.599Z","level":"info","event":"request","method":"GET","path":"/api/transactions/income"}
+{"timestamp":"2026-10-10T11:33:44.724Z","level":"info","event":"request","method":"GET","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:44.745Z","level":"info","event":"auth_missing_token","path":"/api/gigs/"}
+{"timestamp":"2026-10-10T11:33:44.777Z","level":"error","event":"request_failed","method":"GET","path":"/api/gigs","statusCode":401,"message":"Authentication required"}
+{"timestamp":"2026-10-10T11:33:44.910Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:44.926Z","level":"info","event":"auth_invalid_token","path":"/api/gigs/"}
+{"timestamp":"2026-10-10T11:33:44.936Z","level":"error","event":"request_failed","method":"POST","path":"/api/gigs","statusCode":401,"message":"Invalid or expired token"}
+{"timestamp":"2026-10-10T11:33:45.050Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:45.063Z","level":"info","event":"rbac_denied","userId":"6aca22948415beb434e0694b","role":"client","path":"/api/gigs/"}
+{"timestamp":"2026-10-10T11:33:45.075Z","level":"error","event":"request_failed","method":"POST","path":"/api/gigs","statusCode":403,"message":"You do not have permission to perform this action"}
+{"timestamp":"2026-10-10T11:33:45.176Z","level":"info","event":"request","method":"PUT","path":"/api/gigs/6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:45.198Z","level":"info","event":"gig_ownership_denied","userId":"6aca22948415beb434e06948","gigId":"6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:45.213Z","level":"error","event":"request_failed","method":"PUT","path":"/api/gigs/6aca22968415beb434e06951","statusCode":403,"message":"You can only modify your own gigs"}
+{"timestamp":"2026-10-10T11:33:45.314Z","level":"info","event":"request","method":"DELETE","path":"/api/gigs/6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:45.334Z","level":"info","event":"gig_ownership_denied","userId":"6aca22948415beb434e06948","gigId":"6aca22968415beb434e06951"}
+{"timestamp":"2026-10-10T11:33:45.345Z","level":"error","event":"request_failed","method":"DELETE","path":"/api/gigs/6aca22968415beb434e06951","statusCode":403,"message":"You can only modify your own gigs"}
+{"timestamp":"2026-10-10T11:33:45.426Z","level":"info","event":"request","method":"POST","path":"/api/bookings"}
+{"timestamp":"2026-10-10T11:33:45.441Z","level":"info","event":"rbac_denied","userId":"6aca22948415beb434e06948","role":"freelancer","path":"/api/bookings/"}
+{"timestamp":"2026-10-10T11:33:45.449Z","level":"error","event":"request_failed","method":"POST","path":"/api/bookings","statusCode":403,"message":"You do not have permission to perform this action"}
+{"timestamp":"2026-10-10T11:33:45.550Z","level":"info","event":"request","method":"GET","path":"/api/bookings/6aca22978415beb434e06967"}
+{"timestamp":"2026-10-10T11:33:45.568Z","level":"info","event":"booking_access_denied","userId":"6aca22948415beb434e06948","bookingId":"6aca22978415beb434e06967"}
+{"timestamp":"2026-10-10T11:33:45.578Z","level":"error","event":"request_failed","method":"GET","path":"/api/bookings/6aca22978415beb434e06967","statusCode":404,"message":"Booking not found"}
+{"timestamp":"2026-10-10T11:33:45.661Z","level":"info","event":"request","method":"GET","path":"/api/transactions/income"}
+{"timestamp":"2026-10-10T11:33:45.675Z","level":"info","event":"rbac_denied","userId":"6aca22948415beb434e0694b","role":"client","path":"/api/transactions/income"}
+{"timestamp":"2026-10-10T11:33:45.688Z","level":"error","event":"request_failed","method":"GET","path":"/api/transactions/income","statusCode":403,"message":"You do not have permission to perform this action"}
+{"timestamp":"2026-10-10T11:33:45.782Z","level":"info","event":"request","method":"POST","path":"/api/bookings"}
+{"timestamp":"2026-10-10T11:33:45.800Z","level":"error","event":"request_failed","method":"POST","path":"/api/bookings","statusCode":400,"message":"Unexpected fields in request"}
+{"timestamp":"2026-10-10T11:33:45.892Z","level":"info","event":"request","method":"POST","path":"/api/auth/login"}
+{"timestamp":"2026-10-10T11:33:45.899Z","level":"warn","event":"unsafe_input_rejected","location":"body","path":"/api/auth/login"}
+{"timestamp":"2026-10-10T11:33:45.908Z","level":"error","event":"request_failed","method":"POST","path":"/api/auth/login","statusCode":400,"message":"Request contains disallowed characters in field names"}
+{"timestamp":"2026-10-10T11:33:46.016Z","level":"info","event":"request","method":"POST","path":"/api/gigs"}
+{"timestamp":"2026-10-10T11:33:46.038Z","level":"info","event":"gig_created","userId":"6aca22938415beb434e06945","gigId":"6aca229a8415beb434e06990"}
+{"timestamp":"2026-10-10T11:33:46.127Z","level":"info","event":"request","method":"POST","path":"/api/auth/login"}
+{"timestamp":"2026-10-10T11:33:46.142Z","level":"error","event":"request_failed","method":"POST","path":"/api/auth/login","statusCode":400,"message":"Expected double-quoted property name in JSON at position 27 (line 1 column 28)"}
+{"timestamp":"2026-10-10T11:33:46.236Z","level":"info","event":"request","method":"GET","path":"/api/gigs/not-a-real-id"}
+{"timestamp":"2026-10-10T11:33:46.347Z","level":"info","event":"request","method":"GET","path":"/api/gigs"}

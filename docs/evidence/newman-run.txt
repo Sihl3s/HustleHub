@@ -1,0 +1,221 @@
+
+> hustlehub-backend@2.0.0 test:api
+> node scripts/run-api-tests.js
+
+newman
+
+HustleHub+ Part 2 API
+
+□ 1. Authentication
+└ Health check (200)
+  GET https://127.0.0.1:27792/health [200 OK, 671B, 80ms]
+  √  Status is 200
+  √  API is up
+
+└ Register freelancer (201)
+  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.33kB, 567ms]
+  √  Status is 201
+  √  Returns a JWT and no password hash
+
+└ Register second freelancer (201)
+  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.33kB, 461ms]
+  √  Status is 201
+
+└ Register client (201)
+  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.31kB, 423ms]
+  √  Status is 201
+
+└ Register invalid input (400)
+  POST https://127.0.0.1:27792/api/auth/register [400 Bad Request, 1.11kB, 20ms]
+  √  Status is 400
+  √  Lists the invalid fields
+  √  Error does not leak internals
+
+└ Register duplicate email (409)
+  POST https://127.0.0.1:27792/api/auth/register [409 Conflict, 818B, 33ms]
+  √  Status is 409
+
+└ Register as admin is refused (400)
+  POST https://127.0.0.1:27792/api/auth/register [400 Bad Request, 882B, 15ms]
+  √  Status is 400
+
+└ Login success (200)
+  POST https://127.0.0.1:27792/api/auth/login [200 OK, 1.32kB, 438ms]
+  √  Status is 200
+  √  Returns a JWT
+
+└ Login wrong password (401)
+  POST https://127.0.0.1:27792/api/auth/login [401 Unauthorized, 806B, 598ms]
+  √  Status is 401
+  √  Generic message does not reveal which part was wrong
+
+└ Get me with token (200)
+  GET https://127.0.0.1:27792/api/me [200 OK, 926B, 41ms]
+  √  Status is 200
+  √  Returns the logged-in user
+
+└ Get me without token (401)
+  GET https://127.0.0.1:27792/api/me [401 Unauthorized, 807B, 40ms]
+  √  Status is 401
+
+□ 2. Gigs
+└ Freelancer creates gig (201)
+  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.16kB, 131ms]
+  √  Status is 201
+  √  Gig is owned by the logged-in freelancer
+
+└ Client browses gigs (200)
+  GET https://127.0.0.1:27792/api/gigs?search=website [200 OK, 1.17kB, 81ms]
+  √  Status is 200
+  √  Finds the new gig
+
+└ Client views gig by id (200)
+  GET https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [200 OK, 1.13kB, 40ms]
+  √  Status is 200
+
+└ Freelancer lists own gigs (200)
+  GET https://127.0.0.1:27792/api/gigs/mine [200 OK, 1.14kB, 44ms]
+  √  Status is 200
+  √  Has at least one gig
+
+└ Freelancer updates own gig (200)
+  PUT https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [200 OK, 1.15kB, 52ms]
+  √  Status is 200
+  √  Price updated
+
+└ Create gig with invalid data (400)
+  POST https://127.0.0.1:27792/api/gigs [400 Bad Request, 1.22kB, 24ms]
+  √  Status is 400
+  √  Error does not leak internals
+
+└ Freelancer creates a gig to delete (201)
+  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.16kB, 48ms]
+  √  Status is 201
+
+└ Freelancer deletes own gig (200)
+  DELETE https://127.0.0.1:27792/api/gigs/6aca22978415beb434e0695f [200 OK, 772B, 36ms]
+  √  Status is 200
+
+□ 3. Bookings and transactions
+└ Client books a gig (201)
+  POST https://127.0.0.1:27792/api/bookings [201 Created, 1.36kB, 55ms]
+  √  Status is 201
+  √  Booking is confirmed with a reference
+  √  Price comes from the gig, not the client
+  √  A transaction was recorded for the booking
+
+└ Client lists own bookings (200)
+  GET https://127.0.0.1:27792/api/bookings/mine [200 OK, 1.28kB, 40ms]
+  √  Status is 200
+  √  Contains the booking
+
+└ Freelancer lists bookings on their gigs (200)
+  GET https://127.0.0.1:27792/api/bookings/mine [200 OK, 1.28kB, 34ms]
+  √  Status is 200
+  √  Freelancer sees the client booking
+
+└ Client views booking by id (200)
+  GET https://127.0.0.1:27792/api/bookings/6aca22978415beb434e06967 [200 OK, 1.27kB, 34ms]
+  √  Status is 200
+
+└ Client lists own transactions (200)
+  GET https://127.0.0.1:27792/api/transactions/mine [200 OK, 1.13kB, 27ms]
+  √  Status is 200
+  √  Has one transaction
+
+└ Freelancer lists own transactions (200)
+  GET https://127.0.0.1:27792/api/transactions/mine [200 OK, 1.13kB, 31ms]
+  √  Status is 200
+  √  Transaction is linked to the booking
+
+└ Freelancer income summary (200)
+  GET https://127.0.0.1:27792/api/transactions/income [200 OK, 887B, 42ms]
+  √  Status is 200
+  √  Income reflects the booking
+
+□ 4. Security and access control
+└ Gigs without token (401)
+  GET https://127.0.0.1:27792/api/gigs [401 Unauthorized, 807B, 95ms]
+  √  Status is 401
+
+└ Tampered JWT is rejected (401)
+  POST https://127.0.0.1:27792/api/gigs [401 Unauthorized, 808B, 46ms]
+  √  Status is 401
+
+└ Client cannot create a gig (403)
+  POST https://127.0.0.1:27792/api/gigs [403 Forbidden, 830B, 40ms]
+  √  Status is 403
+
+└ Other freelancer cannot update the gig (403)
+  PUT https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [403 Forbidden, 811B, 52ms]
+  √  Status is 403
+
+└ Other freelancer cannot delete the gig (403)
+  DELETE https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [403 Forbidden, 811B, 45ms]
+  √  Status is 403
+
+└ Freelancer cannot book a gig (403)
+  POST https://127.0.0.1:27792/api/bookings [403 Forbidden, 830B, 37ms]
+  √  Status is 403
+
+└ Outsider cannot view the booking (404)
+  GET https://127.0.0.1:27792/api/bookings/6aca22978415beb434e06967 [404 Not Found, 798B, 44ms]
+  √  Status is 404
+
+└ Client cannot view income summary (403)
+  GET https://127.0.0.1:27792/api/transactions/income [403 Forbidden, 830B, 45ms]
+  √  Status is 403
+
+└ Client cannot set the booking price (400)
+  POST https://127.0.0.1:27792/api/bookings [400 Bad Request, 809B, 35ms]
+  √  Status is 400
+  √  Unexpected fields are refused
+
+└ NoSQL injection in login is rejected (400)
+  POST https://127.0.0.1:27792/api/auth/login [400 Bad Request, 716B, 29ms]
+  √  Status is 400
+  √  No token issued
+
+└ XSS in gig title is escaped (201)
+  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.18kB, 34ms]
+  √  Status is 201
+  √  Script tags are stored escaped
+
+└ Malformed JSON is handled safely (400)
+  POST https://127.0.0.1:27792/api/auth/login [400 Bad Request, 693B, 37ms]
+  √  Status is 400
+  √  Error does not leak internals
+
+└ Invalid id is rejected (400)
+  GET https://127.0.0.1:27792/api/gigs/not-a-real-id [400 Bad Request, 857B, 17ms]
+  √  Status is 400
+
+└ Security headers are present
+  GET https://127.0.0.1:27792/api/gigs [200 OK, 1.56kB, 26ms]
+  √  Status is 200
+  √  Content-Security-Policy is set
+  √  nosniff is set
+  √  Framing is denied
+  √  Responses are not cached
+  √  Framework is hidden
+  √  Rate limit headers are sent
+
+┌─────────────────────────┬────────────────────┬────────────────────┐
+│                         │           executed │             failed │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              iterations │                  1 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│                requests │                 40 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│            test-scripts │                 40 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│      prerequest-scripts │                  1 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              assertions │                 70 │                  0 │
+├─────────────────────────┴────────────────────┴────────────────────┤
+│ total run duration: 7.4s                                          │
+├───────────────────────────────────────────────────────────────────┤
+│ total data received: 11.06kB (approx)                             │
+├───────────────────────────────────────────────────────────────────┤
+│ average response time: 100ms [min: 15ms, max: 598ms, s.d.: 153ms] │
+└───────────────────────────────────────────────────────────────────┘
