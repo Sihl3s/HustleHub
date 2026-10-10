@@ -23,6 +23,8 @@ const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
 const meRoutes = require('./routes/me');
 const gigRoutes = require('./routes/gigs');
+const bookingRoutes = require('./routes/bookings');
+const transactionRoutes = require('./routes/transactions');
 
 const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
@@ -69,6 +71,8 @@ app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/gigs', gigRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
