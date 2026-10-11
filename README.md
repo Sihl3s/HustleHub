@@ -456,9 +456,23 @@ The script starts the HTTPS API with an in-memory MongoDB and a temporary certif
 
 ## Frontend tests
 
-Frontend automated tests (component rendering and user interaction) are run from the `frontend` folder. They are part of Thami's testing section; the command and results will be documented here once added.
+Frontend automated tests are built using **Vitest** and ***React Testing Library** ('@testing-Library/react') to verify component rendering, access control, and user interactions within the React (Vite) presentation tier.
 
+##Running the tests
+
+From the repository root, switch to the 'frontend' directory and execute the test runner:
+
+'''bash
+cd frontend
+npm test
 ---
+
+### How to do it in VS Code:
+1. In the Explorer on the left, click on `README.md` at the very bottom (in the root directory)[cite: 1, 4].
+2. Press `Ctrl + F` and search for `## Frontend tests`[cite: 1].
+3. Highlight the placeholder lines right under that heading[cite: 1].
+4. Paste the text above in its place.
+5. Press `Ctrl + S` to save the file.
 
 # Evidence and Demonstration Videos
 
