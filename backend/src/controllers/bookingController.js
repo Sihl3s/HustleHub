@@ -32,9 +32,20 @@ function confirmationReference(booking) {
 }
 
 function toPublicBooking(booking, transaction) {
+  const gigReference = booking.populated('gig') || booking.gig;
   const gig = booking.gig && booking.gig._id
-    ? { id: booking.gig._id.toString(), title: booking.gig.title, category: booking.gig.category }
-    : { id: refId(booking.gig) };
+    ? {
+        id: booking.gig._id.toString(),
+        title: booking.gig.title,
+        category: booking.gig.category,
+      }
+    : {
+        id: gigReference
+          ? (gigReference._id || gigReference).toString()
+          : null,
+        title: 'Deleted gig',
+        category: '',
+      };
 
   return {
     id: booking._id.toString(),
