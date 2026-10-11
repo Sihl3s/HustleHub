@@ -1,54 +1,148 @@
 import { useEffect, useState } from 'react'
 
-const sampleGigs = [
-  {
-    id: 1,
-    title: 'Logo and brand identity',
-    category: 'Design',
-    seller: 'Amara N.',
-    description: 'A logo and color palette for your business.',
-    price: '85',
-  },
-  {
-    id: 2,
-    title: 'Build a responsive website',
-    category: 'Development',
-    seller: 'Leo M.',
-    description: 'A mobile-friendly website for a small business.',
-    price: '240',
-  },
-  {
-    id: 3,
-    title: 'Proofread your writing',
-    category: 'Writing',
-    seller: 'Zanele K.',
-    description: 'Careful proofreading for reports and web pages.',
-    price: '35',
-  },
-]
-
 const categories = ['Design', 'Development', 'Writing', 'Marketing']
 const emptyForm = {
   title: '',
   category: 'Design',
   description: '',
   price: '',
+  deliveryDays: '3',
+}
+
+function getAuthHeaders(extraHeaders = {}) {
+  const token = sessionStorage.getItem('token')
+
+  return {
+    'Content-Type': 'application/json',
+    ...extraHeaders,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+//(React,2026)
+async function apiRequest(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: getAuthHeaders(options.headers || {}),
+  })
+
+  const contentType = response.headers.get('content-type') || ''
+  const data = contentType.includes('application/json') ? await response.json() : {}
+
+  if (!response.ok) {
+    throw new Error(data.error?.message || data.message || 'Request failed')
+  }
+
+  return data
 }
 
 export default function GigBrowser({ user, onLogout }) {
   const [view, setView] = useState('browse')
   const [search, setSearch] = useState('')
+  const [gigs, setGigs] = useState([])
   const [myGigs, setMyGigs] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState(null)
   const [bookings, setBookings] = useState([])
+  const [transactions, setTransactions] = useState([])
+  const [income, setIncome] = useState({
+    currency: 'ZAR',
+    totalIncome: 0,
+    transactionCount: 0,
+    monthly: [],
+  })
   const [selectedGig, setSelectedGig] = useState(null)
   const [bookingDate, setBookingDate] = useState('')
   const [projectDetails, setProjectDetails] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  
 
-  const allGigs = [...sampleGigs, ...myGigs]
+  async function loadGigs() {
+    try {
+      const data = await apiRequest('/api/gigs?limit=20')
+      setGigs(data.gigs || [])
+    } catch (error) {
+      setGigs(sampleGigs)
+      setSuccessMessage(error.message)
+    }
+  }
+
+  async function loadMyGigs() {
+    try {
+      const data = await apiRequest('/api/gigs/mine')
+      setMyGigs(data.gigs || [])
+    } catch (error) {
+      setMyGigs([])
+      setSuccessMessage(error.message)
+    }
+  }
+
+  async function loadBookings() {
+    try {
+      const data = await apiRequest('/api/bookings/mine')
+      const nextBookings = data.bookings || []
+
+      setBookings(
+        nextBookings.map((booking) => ({
+          id: booking.id,
+          gigTitle: booking.gig?.title || 'Gig',
+          seller: booking.freelancer?.fullName || 'Freelancer',
+          price: booking.price,
+          date: booking.createdAt ? new Date(booking.createdAt).toISOString().slice(0, 10) : '',
+          details: booking.notes || '',
+          status: booking.status || 'confirmed',
+          confirmationReference: booking.confirmationReference,
+        })),
+      )
+    } catch (error) {
+      setBookings([])
+      setSuccessMessage(error.message)
+    }
+  }
+
+  async function loadTransactions() {
+    try {
+      const data = await apiRequest('/api/transactions/mine')
+      setTransactions(data.transactions || [])
+    } catch (error) {
+      setTransactions([])
+      setSuccessMessage(error.message)
+    }
+  }
+
+  async function loadIncome() {
+    try {
+      const data = await apiRequest('/api/transactions/income')
+      setIncome(data.income || {
+        currency: 'ZAR',
+        totalIncome: 0,
+        transactionCount: 0,
+        monthly: [],
+      })
+    } catch (error) {
+      setIncome({
+        currency: 'ZAR',
+        totalIncome: 0,
+        transactionCount: 0,
+        monthly: [],
+      })
+      setSuccessMessage(error.message)
+    }
+  }
+
+  useEffect(() => {
+    loadGigs()
+
+    if (user.role === 'freelancer') {
+      loadMyGigs()
+      loadIncome()
+    }
+
+    if (user.role === 'client' || user.role === 'freelancer') {
+      loadBookings()
+      loadTransactions()
+    }
+  }, [user.role])
+
+  const allGigs = gigs
   const filteredGigs = allGigs.filter((gig) =>
     `${gig.title} ${gig.category} ${gig.description}`
       .toLowerCase()
@@ -64,26 +158,43 @@ export default function GigBrowser({ user, onLogout }) {
     setEditingId(null)
   }
 
-  function saveGig(event) {
+  async function saveGig(event) {
     event.preventDefault()
 
-    const gig = {
-      ...form,
-      id: editingId ?? Date.now(),
-      seller: user.fullName,
+    const payload = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      category: form.category,
+      price: Number(form.price),
+      deliveryDays: Number(form.deliveryDays || 3),
     }
 
-    if (editingId) {
-      setMyGigs(myGigs.map((item) => item.id === editingId ? gig : item))
-    } else {
-      setMyGigs([...myGigs, gig])
-    }
-    const wasEditing = editingId !== null
-    resetForm()
+    try {
+      if (editingId) {
+        const data = await apiRequest(`/api/gigs/${editingId}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        })
 
-    setSuccessMessage(
-        wasEditing ? 'Gig updated successfully.' : 'Service created successfully.',
+        setMyGigs((currentGigs) =>
+          currentGigs.map((gig) => (gig.id === editingId ? data.gig : gig)),
         )
+        setSuccessMessage('Gig updated successfully.')
+      } else {
+        const data = await apiRequest('/api/gigs', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        })
+
+        setMyGigs((currentGigs) => [data.gig, ...currentGigs])
+        setSuccessMessage('Service created successfully.')
+      }
+
+      resetForm()
+      await loadGigs()
+    } catch (error) {
+      setSuccessMessage(error.message)
+    }
   }
 
   function editGig(gig) {
@@ -92,44 +203,87 @@ export default function GigBrowser({ user, onLogout }) {
       category: gig.category,
       description: gig.description,
       price: gig.price,
+      deliveryDays: gig.deliveryDays || 3,
     })
     setEditingId(gig.id)
   }
 
-  function startBooking(gig){
+  async function deleteGig(gigId) {
+    try {
+      await apiRequest(`/api/gigs/${gigId}`, { method: 'DELETE' })
+      setMyGigs((currentGigs) => currentGigs.filter((gig) => gig.id !== gigId))
+      setSuccessMessage('Gig deleted.')
+
+      if (editingId === gigId) {
+        resetForm()
+      }
+
+      await loadGigs()
+    } catch (error) {
+      setSuccessMessage(error.message)
+    }
+  }
+
+  async function toggleGigStatus(gig) {
+    try {
+      const nextState = !gig.isActive
+      const data = await apiRequest(`/api/gigs/${gig.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ isActive: nextState }),
+      })
+
+      setMyGigs((currentGigs) =>
+        currentGigs.map((item) => (item.id === gig.id ? data.gig : item)),
+      )
+      setSuccessMessage(nextState ? 'Gig is now live in the marketplace.' : 'Gig is hidden from the marketplace.')
+      await loadGigs()
+    } catch (error) {
+      setSuccessMessage(error.message)
+    }
+  }
+
+  function startBooking(gig) {
     setSelectedGig(gig)
     setBookingDate('')
     setProjectDetails('')
-    setSuccessMessage('Booking request sent successfully.')
+    setSuccessMessage('')
     setView('booking')
   }
 
-  function submitBooking(event){
+  async function submitBooking(event) {
     event.preventDefault()
 
-    setBookings((currentBookings) => [
-        ...currentBookings,
+    try {
+      const data = await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify({
+          gigId: selectedGig.id,
+          notes: projectDetails.trim(),
+        }),
+      })
+
+      setBookings((currentBookings) => [
         {
-            id: Date.now(),
-            gigTitle: selectedGig.title,
-            seller: selectedGig.seller,
-            price: selectedGig.price,
-            date: bookingDate,
-            details: projectDetails,
-            status: 'Requested',
+          id: data.booking.id,
+          gigTitle: data.booking.gig?.title || selectedGig.title,
+          seller: data.booking.freelancer?.fullName || selectedGig.freelancer?.fullName || 'Freelancer',
+          price: data.booking.price,
+          date: data.booking.createdAt ? new Date(data.booking.createdAt).toISOString().slice(0, 10) : bookingDate,
+          details: data.booking.notes || projectDetails,
+          status: data.booking.status,
+          confirmationReference: data.booking.confirmationReference,
         },
-    ])
+        ...currentBookings,
+      ])
 
-    setSelectedGig(null)
-    setView('bookings')
+      setSelectedGig(null)
+      setView('bookings')
+      setSuccessMessage('Booking confirmed. Payment was simulated and a transaction was recorded.')
+      await loadTransactions()
+    } catch (error) {
+      setSuccessMessage(error.message)
+    }
   }
-
-  function removeBooking(bookingId) {
-  setBookings((currentBookings) =>
-    currentBookings.filter((booking) => booking.id !== bookingId),
-  )
-  setSuccessMessage('Booking removed.')
-}
 
   return (
     <div className="market-shell">
@@ -145,15 +299,15 @@ export default function GigBrowser({ user, onLogout }) {
             Browse gigs
           </button>
 
-            {user.role === 'client' && (
+          {(user.role === 'client' || user.role === 'freelancer') && (
             <button
-                type="button"
-                className={view === 'bookings' ? 'nav-button active' : 'nav-button'}
-                onClick={() => setView('bookings')}
+              type="button"
+              className={view === 'bookings' ? 'nav-button active' : 'nav-button'}
+              onClick={() => setView('bookings')}
             >
-                My bookings
+              My bookings
             </button>
-            )}
+          )}
 
           {user.role === 'freelancer' && (
             <button
@@ -174,96 +328,117 @@ export default function GigBrowser({ user, onLogout }) {
 
       {view === 'booking' && user.role === 'client' && selectedGig ? (
         <main className="management-content">
+          <p className="market-eyebrow">Booking request</p>
+          <h1>Request a service</h1>
 
-            <p className="market-eyebrow">Booking request</p>
-            <h1>Request a service</h1>
-
-            <section className="booking-summary">
+          <section className="booking-summary">
             <h2>{selectedGig.title}</h2>
-            <p>Freelancer: {selectedGig.seller}</p>
+            <p>Freelancer: {selectedGig.freelancer?.fullName || selectedGig.seller || 'Freelancer'}</p>
             <strong>Price: R{selectedGig.price}</strong>
-            </section>
+          </section>
 
-            <form className="gig-form booking-form" onSubmit={submitBooking}>
+          <form className="gig-form booking-form" onSubmit={submitBooking}>
             <label>
-                Requested date
-                <input
+              Requested date
+              <input
                 type="date"
                 value={bookingDate}
                 min={new Date().toISOString().slice(0, 10)}
                 onChange={(event) => setBookingDate(event.target.value)}
                 required
-                />
+              />
             </label>
 
             <label>
-                What do you need done?
-                <textarea
+              What do you need done?
+              <textarea
                 value={projectDetails}
                 onChange={(event) => setProjectDetails(event.target.value)}
                 rows={5}
                 maxLength={500}
                 required
-                />
+              />
             </label>
 
             <button className="auth-submit" type="submit">
-                Send booking request
+              Send booking request
             </button>
 
             <button
-                className="cancel-edit"
-                type="button"
-                onClick={() => setView('browse')}
+              className="cancel-edit"
+              type="button"
+              onClick={() => setView('browse')}
             >
-                Back to gigs
+              Back to gigs
             </button>
-            </form>
+          </form>
         </main>
-    ) : view === 'bookings' && user.role === 'client' ? (
-  <main className="management-content">
-    <p className="market-eyebrow">Client workspace</p>
-    <h1>My bookings</h1>
+      ) : view === 'bookings' && (user.role === 'client' || user.role === 'freelancer') ? (
+        <main className="management-content">
+          <p className="market-eyebrow">{user.role === 'client' ? 'Client workspace' : 'Freelancer workspace'}</p>
+          <h1>{user.role === 'client' ? 'My bookings' : 'Bookings on your gigs'}</h1>
 
-    {successMessage && (
-        <p className="success-message" role="status">{successMessage}</p>
-    )}
+          {successMessage && (
+            <p className="success-message" role="status">{successMessage}</p>
+          )}
 
-    {bookings.length === 0 ? (
-      <p>You haven’t requested any gigs yet. Browse gigs to get started.</p>
-    ) : (
-      <div className="booking-list">
-        {bookings.map((booking) => (
-          <article className="manage-gig" key={booking.id}>
-            <div>
-              <p className="gig-category">{booking.status}</p>
-              <h3>{booking.gigTitle}</h3>
-              <p>Freelancer: {booking.seller}</p>
-              <p>Requested date: {booking.date}</p>
-              <p>{booking.details}</p>
-              <strong>R{booking.price}</strong>
-              <button
-                className="booking-remove-button"
-                type="button"
-                onClick={() => removeBooking(booking.id)}
-                >
-                Remove booking
-              </button>
-
+          {bookings.length === 0 ? (
+            <p>
+              {user.role === 'client'
+                ? 'You haven’t requested any gigs yet. Browse gigs to get started.'
+                : 'No bookings have been made on your gigs yet.'}
+            </p>
+          ) : (
+            <div className="booking-list">
+              {bookings.map((booking) => (
+                <article className="manage-gig" key={booking.id}>
+                  <div>
+                    <p className="gig-category">{booking.status}</p>
+                    <h3>{booking.gigTitle}</h3>
+                    <p>
+                      {user.role === 'client'
+                        ? `Freelancer: ${booking.seller}`
+                        : `Client: ${booking.seller}`}
+                    </p>
+                    {booking.confirmationReference && (
+                      <p>Reference: {booking.confirmationReference}</p>
+                    )}
+                    <p>Requested date: {booking.date}</p>
+                    <p>{booking.details}</p>
+                    <strong>R{booking.price}</strong>
+                  </div>
+                </article>
+              ))}
             </div>
-          </article>
-        ))}
-      </div>
-      )}
-  </main>
-  //Freelancer Management screen
-        ) : view === 'manage' && user.role === 'freelancer' ? (
+          )}
+        </main>
+      ) : view === 'manage' && user.role === 'freelancer' ? (
         <main className="management-content">
           <p className="market-eyebrow">Freelancer workspace</p>
           <h1>Manage your gigs</h1>
           {successMessage && (
             <p className="success-message" role="status">{successMessage}</p>
           )}
+
+          <div className="income-summary">
+            <h2>Income summary</h2>
+            <p>
+              Total income: <strong>R{income.totalIncome}</strong>
+            </p>
+            <p>
+              Transactions: <strong>{income.transactionCount}</strong>
+            </p>
+            {income.monthly.length > 0 && (
+              <ul>
+                {income.monthly.map((month) => (
+                  <li key={month.month}>
+                    {month.month}: R{month.income} ({month.transactionCount} bookings)
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <p className="market-intro">
             Create a service listing or update the ones you have added.
           </p>
@@ -321,6 +496,19 @@ export default function GigBrowser({ user, onLogout }) {
                 />
               </label>
 
+              <label>
+                Delivery days
+                <input
+                  name="deliveryDays"
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={form.deliveryDays}
+                  onChange={updateForm}
+                  required
+                />
+              </label>
+
               <button className="auth-submit" type="submit">
                 {editingId ? 'Save changes' : 'Add gig'}
               </button>
@@ -345,7 +533,7 @@ export default function GigBrowser({ user, onLogout }) {
                 myGigs.map((gig) => (
                   <article className="manage-gig" key={gig.id}>
                     <div>
-                      <p className="gig-category">{gig.category}</p>
+                      <p className="gig-category">{gig.isActive ? 'Live' : 'Hidden'}</p>
                       <h3>{gig.title}</h3>
                       <p>{gig.description}</p>
                       <strong>R{gig.price}</strong>
@@ -355,13 +543,13 @@ export default function GigBrowser({ user, onLogout }) {
                       <button type="button" onClick={() => editGig(gig)}>
                         Edit
                       </button>
+                      <button type="button" onClick={() => toggleGigStatus(gig)}>
+                        {gig.isActive ? 'Hide' : 'Show'}
+                      </button>
                       <button
                         className="delete-action"
                         type="button"
-                        onClick={() => {
-                          setMyGigs(myGigs.filter((item) => item.id !== gig.id))
-                          if (editingId === gig.id) resetForm()
-                        }}
+                        onClick={() => deleteGig(gig.id)}
                       >
                         Delete
                       </button>
@@ -402,19 +590,19 @@ export default function GigBrowser({ user, onLogout }) {
                   <h3>{gig.title}</h3>
                   <p className="gig-description">{gig.description}</p>
                   <div className="gig-footer">
-                    <span>{gig.seller}</span>
+                    <span>{gig.freelancer?.fullName || gig.seller || 'Freelancer'}</span>
                     <strong>From R{gig.price}</strong>
                   </div>
 
                   {user.role === 'client' && (
                     <button
-                        className="book-gig-button"
-                        type="button"
-                        onClick={() => startBooking(gig)}
+                      className="book-gig-button"
+                      type="button"
+                      onClick={() => startBooking(gig)}
                     >
-                        Book this gig
+                      Book this gig
                     </button>
-                    )}
+                  )}
                 </article>
               ))}
             </div>
