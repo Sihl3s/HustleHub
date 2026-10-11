@@ -108,7 +108,7 @@ The system provides:
 
 HustleHub+ follows a **3-tier architecture**: the React presentation tier, the Express API tier and the MongoDB data tier. Everything the user controls (the browser, Postman) is outside the system boundary and treated as untrusted. Every request passes through HTTPS and the API's security middleware before it reaches business logic or the database.
 
-![HustleHub+ Architecture Diagram](docs/images/architecture-diagram.png)
+![HustleHub+ Architecture Diagram](docs/images/architecture-diagram-part-2.jpeg)
 
 The up-to-date Part 2 diagram, including the security middleware chain and the booking sequence, is in [docs/architecture.md](docs/architecture.md).
 
