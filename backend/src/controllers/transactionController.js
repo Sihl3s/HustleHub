@@ -14,12 +14,15 @@ function toPublicTransaction(transaction) {
     ? { id: value._id.toString(), fullName: value.fullName }
     : { id: value.toString() });
 
+  // A deleted gig populates as null; the original id is still kept by Mongoose.
+  const gigId = transaction.populated('gig') || transaction.gig;
+
   return {
     id: transaction._id.toString(),
     booking: transaction.booking.toString(),
     gig: transaction.gig && transaction.gig._id
       ? { id: transaction.gig._id.toString(), title: transaction.gig.title }
-      : { id: transaction.gig.toString() },
+      : { id: gigId ? gigId.toString() : null, title: 'Deleted gig' },
     client: party(transaction.client),
     freelancer: party(transaction.freelancer),
     amount: transaction.amount,

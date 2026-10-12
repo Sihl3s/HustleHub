@@ -678,7 +678,7 @@
 .dashboard-greeting {
   margin-bottom: 12px;
   color: #176b50;
-  font-family: Lucida Handwriting ,c ursive;
+  font-family: 'Lucida Handwriting', cursive;
   font-size: 30px;
   font-weight: 600;
   line-height: 1.2;
@@ -692,6 +692,44 @@
   background: #e4ebe5;
   color: #123d2e;
   font-weight: 600;
+}
+
+.error-message {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px solid #d49a93;
+  border-radius: 4px;
+  background: #fbecea;
+  color: #8f2d26;
+  font-weight: 600;
+}
+
+.income-summary {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid #8ab39c;
+  border-radius: 6px;
+  background: #f4f8f5;
+}
+
+.income-summary h2 {
+  margin-top: 0;
+}
+
+.transaction-list {
+  margin-top: 28px;
+}
+
+.transaction-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-list th,
+.transaction-list td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #d8e2dc;
+  text-align: left;
 }
 
 .booking-remove-button {

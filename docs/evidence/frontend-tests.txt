@@ -1,0 +1,26 @@
+
+ RUN  v5.0.3 C:/Users/sihle/OneDrive/Desktop/BCAD/Year 3/INSY7314/HustleHub/frontend
+
+ ✓ src/GigBrowser.test.jsx > GigBrowser role-based views > a client can browse and book gigs but cannot manage gigs 366ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser role-based views > a freelancer can manage gigs but cannot book 65ms
+ ✓ src/App.test.jsx > App authentication screens > renders the login form and switches to registration 407ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser role-based views > escaped text from the API is shown as plain text, never as HTML 47ms
+ ✓ src/App.test.jsx > App authentication screens > shows the password only when the user asks to 98ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser role-based views > search filters the gig list 214ms
+ ✓ src/App.test.jsx > App authentication screens > shows the API error when login fails and stores no token 647ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser booking flow > a client books a gig and sees the confirmation and transaction 603ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser booking flow > booking errors such as rate limiting are shown to the client 363ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser booking flow > a freelancer sees which client booked their gig 80ms
+ ✓ src/App.test.jsx > App authentication screens > shows field-level validation messages from the API 834ms
+ ✓ src/App.test.jsx > App authentication screens > logs in, stores the token for the session and opens the marketplace 610ms
+ ✓ src/App.test.jsx > App authentication screens > logs the user out when the session token has expired 50ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser gig management > a freelancer creates a gig with the form 865ms
+ ✓ src/App.test.jsx > App authentication screens > log out clears the session 73ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser gig management > editing a gig fills the form with readable text, not escaped entities 139ms
+ ✓ src/GigBrowser.test.jsx > GigBrowser gig management > the freelancer income summary is displayed 94ms
+
+ Test Files  2 passed (2)
+      Tests  17 passed (17)
+   Start at  11:31:50
+   Duration  10.94s (environment 55%, tests 28%, setup 9%, transform 5%, import 2%)
+

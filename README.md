@@ -78,11 +78,10 @@ The system provides:
 
 ### Frontend (React)
 - Registration and login screens connected to the API, with client-side validation and safe error messages.
-- Browse gigs, freelancer gig management and client booking screens.
+- Every screen uses the live API (MDN, 2026): gig browsing and search, freelancer gig management, client booking with a requested date, bookings and transactions lists, and the freelancer income summary.
+- API errors (validation, 403, 404, 429) are shown to the user, and an expired token logs the user out.
 - The JWT is kept in `sessionStorage`, so it is cleared when the browser tab is closed.
 - Served with a Content Security Policy and security headers (see [Frontend CSP](#content-security-policy-and-security-headers)).
-
-> Status: login and registration call the live API. The gig browsing, gig management and booking screens are being connected to the gig, booking and transaction endpoints listed below.
 
 ---
 
@@ -101,6 +100,7 @@ The system provides:
 | express-rate-limit | Rate limiting on sensitive endpoints |
 | Jest, Supertest, mongodb-memory-server | Backend unit and integration tests |
 | Postman + Newman | API endpoint testing |
+| Vitest + React Testing Library | Frontend component tests |
 
 ---
 
@@ -176,7 +176,7 @@ Base URL: `https://127.0.0.1:3443`. All `/api` routes except register and login 
 ### Bookings and transactions
 | Method | Path | Who | Notes |
 |---|---|---|---|
-| POST | `/api/bookings` | client | `{ gigId, notes? }`. Price and freelancer come from the stored gig. Creates a booking **and** a transaction. Rate limited per client |
+| POST | `/api/bookings` | client | `{ gigId, notes?, requestedDate? }`. `requestedDate` is `YYYY-MM-DD`, from today up to one year ahead. Price and freelancer come from the stored gig. Creates a booking **and** a transaction. Rate limited per client |
 | GET | `/api/bookings/mine` | client, freelancer | A client sees bookings they made; a freelancer sees bookings on their gigs |
 | GET | `/api/bookings/:id` | booking parties only | 404 for anyone who is not the client or freelancer on the booking |
 | GET | `/api/transactions/mine` | client, freelancer | Only the caller's own transactions |
@@ -344,13 +344,13 @@ HustleHub/
 │   ├── tests/                       # Jest + Supertest: auth, gigs, bookings, security
 │   └── .env.example
 ├── frontend/
-│   ├── src/                         # React app (App.jsx, GigBrowser.jsx)
-│   └── vite.config.js               # API proxy, CSP and security headers
+│   ├── src/                         # React app (App.jsx, GigBrowser.jsx, api.js) and *.test.jsx
+│   └── vite.config.js               # API proxy, CSP, security headers and Vitest setup
 ├── postman/
 │   └── HustleHub.postman_collection.json
 └── docs/
     ├── architecture.md              # Part 2 architecture and booking flow diagrams
-    ├── evidence/                    # Newman output, JUnit report, server event log
+    ├── evidence/                    # Newman, Postman and frontend test evidence
     └── images/
 ```
 
@@ -434,18 +434,18 @@ cd backend
 npm test
 ```
 
-The tests use **Supertest** against the Express app and an **in-memory MongoDB**, so no database or certificate is needed. There are 52 tests across four suites:
+The tests use **Supertest** against the Express app and an **in-memory MongoDB**, so no database or certificate is needed. There are 55 tests across four suites:
 
 | Suite | Covers |
 |---|---|
 | `tests/password.test.js` | bcrypt hashing and verification |
 | `tests/gigs.test.js` | Registration and login, duplicate email, admin self-registration refused, gig CRUD, RBAC and ownership |
-| `tests/bookings.test.js` | Booking creates exactly one linked transaction, price taken from the gig, inactive gigs refused, notes escaped, bookings by role, income per freelancer, per-client booking rate limit (429) |
+| `tests/bookings.test.js` | Booking creates exactly one linked transaction, price taken from the gig, inactive gigs refused, notes escaped, requested date stored and past, far-future or malformed dates refused, bookings by role, history still loads after a gig is deleted, income per freelancer, per-client booking rate limit (429) |
 | `tests/security.test.js` | 401 on every protected route without a token; tampered, `alg: none`, wrong issuer or audience, unknown role and expired tokens; RBAC and IDOR checks; price tampering; NoSQL injection in bodies and query strings; prototype pollution; XSS escaping; 415, 413 and malformed JSON with no leaked internals; CSP and security headers; auth rate limiting (429) |
 
 ## API endpoint tests (Postman and Newman)
 
-The Postman collection (`postman/HustleHub.postman_collection.json`) has **40 requests and 70 assertions** in four folders: authentication, gigs, bookings and transactions, and security and access control. Run it with Newman:
+The Postman collection (`postman/HustleHub.postman_collection.json`) has **40 requests and 71 assertions** in four folders: authentication, gigs, bookings and transactions, and security and access control. Run it with Newman:
 
 ```bash
 cd backend
@@ -454,31 +454,29 @@ npm run test:api
 
 The script starts the HTTPS API with an in-memory MongoDB and a temporary certificate, runs the collection with Newman, and writes the evidence to `docs/evidence/`. See [postman/README.md](postman/README.md) for running it in Postman instead.
 
-## Frontend tests
+## Frontend tests (Vitest and React Testing Library)
 
-Frontend automated tests are built using **Vitest** and ***React Testing Library** ('@testing-Library/react') to verify component rendering, access control, and user interactions within the React (Vite) presentation tier.
-
-##Running the tests
-
-From the repository root, switch to the 'frontend' directory and execute the test runner:
-
-'''bash
+```bash
 cd frontend
 npm test
----
+```
 
-### How to do it in VS Code:
-1. In the Explorer on the left, click on `README.md` at the very bottom (in the root directory)[cite: 1, 4].
-2. Press `Ctrl + F` and search for `## Frontend tests`[cite: 1].
-3. Highlight the placeholder lines right under that heading[cite: 1].
-4. Paste the text above in its place.
-5. Press `Ctrl + S` to save the file.
+The tests render the real React components in a simulated browser (jsdom) with a mocked `fetch`, so the API does not need to be running. There are 17 tests across two files:
+
+| File | Covers |
+|---|---|
+| `src/App.test.jsx` | Login and registration screens (no admin option), password visibility toggle, failed login and field-level validation messages, token stored in `sessionStorage` and sent as a Bearer header, logout on an expired token, logout clears the session |
+| `src/GigBrowser.test.jsx` | Client and freelancer see different screens, escaped text is shown as plain text and never as HTML, search, the booking flow (requested date sent, confirmation reference and transaction shown), rate-limit (429) errors shown, freelancers see which client booked, gig create and edit, the freelancer income summary |
+
+---
 
 # Evidence and Demonstration Videos
 
 - **Part 1 demo video:** https://youtu.be/ZT6XeQMRhIE
 - **Part 2 demo video:** _link to be added_
 - **Newman execution evidence:** [docs/evidence/newman-run.txt](docs/evidence/newman-run.txt), [docs/evidence/newman-junit.xml](docs/evidence/newman-junit.xml) and the server's security event log [docs/evidence/newman-server-events.jsonl](docs/evidence/newman-server-events.jsonl)
+- **Part 2 Postman screenshots:** the `docs/evidence/Screenshot 2026-10-11 *.png` files show the collection run in Postman with every test passing
+- **Frontend test evidence:** [docs/evidence/frontend-tests.txt](docs/evidence/frontend-tests.txt)
 - **Part 1 Postman screenshots:** the `Screenshot 2026-09-07 *.png` files in the repository root
 
 ---
@@ -503,6 +501,7 @@ npm test
 - Helmetjs (2025) *Helmet: help secure Express apps with HTTP response headers*. Available at: https://helmetjs.github.io/ (Accessed: 4 September 2026).
 - Kath, H. (2021) *What is SSL, TLS, and HTTPS?* GoAnywhere, 13 January. Available at: https://www.goanywhere.com/blog/what-is-ssl-tls-and-https (Accessed: 7 September 2026).
 - MDN (2025) *Content Security Policy (CSP)*. Mozilla Developer Network. Available at: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP (Accessed: 10 October 2026).
+- MDN (2026) *Using the Fetch API*. Mozilla Developer Network. Available at: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch (Accessed: 11 October 2026).
 - MongoDB (2026) *MERN stack explained*. Available at: https://www.mongodb.com/resources/languages/mern-stack (Accessed: 7 September 2026).
 - Node.js (2025) *HTTPS*. Available at: https://nodejs.org/api/https.html (Accessed: 4 September 2026).
 - OWASP (2024) *Improper error handling*. Available at: https://owasp.org/www-community/Improper_Error_Handling (Accessed: 4 September 2026).
