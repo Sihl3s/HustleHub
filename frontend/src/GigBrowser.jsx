@@ -602,7 +602,9 @@ export default function GigBrowser({ user, onLogout }) {
 
           <div className="gig-results-heading">
             <h2>Available gigs</h2>
-            <span>{filteredGigs.length} services</span>
+            <span>
+              {filteredGigs.length} {filteredGigs.length === 1 ? 'service' : 'services'}
+            </span>
           </div>
 
           {filteredGigs.length > 0 ? (
