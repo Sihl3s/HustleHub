@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { apiRequest, decodeHtml } from './api.js'
 
 const categories = ['Design', 'Development', 'Writing', 'Marketing']
 const emptyForm = {
@@ -8,31 +9,105 @@ const emptyForm = {
   price: '',
   deliveryDays: '3',
 }
+const emptyIncome = {
+  currency: 'ZAR',
+  totalIncome: 0,
+  transactionCount: 0,
+  monthly: [],
+}
 
-function getAuthHeaders(extraHeaders = {}) {
-  const token = sessionStorage.getItem('token')
-
+function normalizeGig(gig) {
   return {
-    'Content-Type': 'application/json',
-    ...extraHeaders,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...gig,
+    title: decodeHtml(gig.title),
+    description: decodeHtml(gig.description),
+    category: decodeHtml(gig.category),
+    freelancer: gig.freelancer
+      ? { ...gig.freelancer, fullName: decodeHtml(gig.freelancer.fullName) }
+      : gig.freelancer,
   }
 }
-//(React,2026)
-async function apiRequest(url, options = {}) {
-  const response = await fetch(url, {
-    ...options,
-    headers: getAuthHeaders(options.headers || {}),
-  })
 
-  const contentType = response.headers.get('content-type') || ''
-  const data = contentType.includes('application/json') ? await response.json() : {}
+function toDateOnly(value) {
+  return value ? new Date(value).toISOString().slice(0, 10) : ''
+}
 
-  if (!response.ok) {
-    throw new Error(data.error?.message || data.message || 'Request failed')
+// Clients see who they booked; freelancers see which client booked them.
+function normalizeBooking(booking, role) {
+  const otherParty = role === 'freelancer' ? booking.client : booking.freelancer
+
+  return {
+    id: booking.id,
+    gigTitle: decodeHtml(booking.gig?.title) || 'Gig',
+    otherParty: decodeHtml(otherParty?.fullName) || (role === 'freelancer' ? 'Client' : 'Freelancer'),
+    price: booking.price,
+    requestedDate: toDateOnly(booking.requestedDate),
+    bookedOn: toDateOnly(booking.createdAt),
+    details: decodeHtml(booking.notes) || '',
+    status: booking.status || 'confirmed',
+    confirmationReference: booking.confirmationReference,
+  }
+}
+
+function normalizeTransaction(transaction) {
+  return {
+    id: transaction.id,
+    gigTitle: decodeHtml(transaction.gig?.title) || 'Gig',
+    client: decodeHtml(transaction.client?.fullName) || 'Client',
+    freelancer: decodeHtml(transaction.freelancer?.fullName) || 'Freelancer',
+    amount: transaction.amount,
+    status: transaction.status,
+    date: toDateOnly(transaction.createdAt),
+  }
+}
+
+// Fetches everything the current role can see. Each request is independent,
+// so one failure (for example a rate limit) does not blank the whole page.
+async function loadDashboard(role) {
+  const isParty = role === 'client' || role === 'freelancer'
+  const requests = {
+    gigs: apiRequest('/api/gigs?limit=50').then((data) => (data.gigs || []).map(normalizeGig)),
+    myGigs: role === 'freelancer'
+      ? apiRequest('/api/gigs/mine').then((data) => (data.gigs || []).map(normalizeGig))
+      : Promise.resolve([]),
+    bookings: isParty
+      ? apiRequest('/api/bookings/mine').then((data) => (data.bookings || []).map((b) => normalizeBooking(b, role)))
+      : Promise.resolve([]),
+    transactions: isParty
+      ? apiRequest('/api/transactions/mine').then((data) => (data.transactions || []).map(normalizeTransaction))
+      : Promise.resolve([]),
+    income: role === 'freelancer'
+      ? apiRequest('/api/transactions/income').then((data) => data.income || emptyIncome)
+      : Promise.resolve(emptyIncome),
   }
 
-  return data
+  const keys = Object.keys(requests)
+  const settled = await Promise.allSettled(Object.values(requests))
+  const result = { error: '' }
+
+  settled.forEach((outcome, index) => {
+    if (outcome.status === 'fulfilled') {
+      result[keys[index]] = outcome.value
+    } else {
+      result[keys[index]] = keys[index] === 'income' ? emptyIncome : []
+      result.error = result.error || outcome.reason.message
+    }
+  })
+
+  return result
+}
+
+function Notice({ notice }) {
+  if (!notice) {
+    return null
+  }
+
+  const isError = notice.type === 'error'
+  return (
+    <p className={isError ? 'error-message' : 'success-message'} role={isError ? 'alert' : 'status'}>
+      {notice.text}
+    </p>
+  )
 }
 
 export default function GigBrowser({ user, onLogout }) {
@@ -44,110 +119,54 @@ export default function GigBrowser({ user, onLogout }) {
   const [editingId, setEditingId] = useState(null)
   const [bookings, setBookings] = useState([])
   const [transactions, setTransactions] = useState([])
-  const [income, setIncome] = useState({
-    currency: 'ZAR',
-    totalIncome: 0,
-    transactionCount: 0,
-    monthly: [],
-  })
+  const [income, setIncome] = useState(emptyIncome)
   const [selectedGig, setSelectedGig] = useState(null)
   const [bookingDate, setBookingDate] = useState('')
   const [projectDetails, setProjectDetails] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
+  const [notice, setNotice] = useState(null)
 
-  async function loadGigs() {
-    try {
-      const data = await apiRequest('/api/gigs?limit=20')
-      setGigs(data.gigs || [])
-    } catch (error) {
-      setGigs(sampleGigs)
-      setSuccessMessage(error.message)
+  const showSuccess = (text) => setNotice({ type: 'success', text })
+  const showError = (text) => setNotice({ type: 'error', text })
+
+  function applyDashboard(data) {
+    setGigs(data.gigs)
+    setMyGigs(data.myGigs)
+    setBookings(data.bookings)
+    setTransactions(data.transactions)
+    setIncome(data.income)
+    if (data.error) {
+      setNotice({ type: 'error', text: data.error })
     }
   }
 
-  async function loadMyGigs() {
-    try {
-      const data = await apiRequest('/api/gigs/mine')
-      setMyGigs(data.gigs || [])
-    } catch (error) {
-      setMyGigs([])
-      setSuccessMessage(error.message)
-    }
-  }
-
-  async function loadBookings() {
-    try {
-      const data = await apiRequest('/api/bookings/mine')
-      const nextBookings = data.bookings || []
-
-      setBookings(
-        nextBookings.map((booking) => ({
-          id: booking.id,
-          gigTitle: booking.gig?.title || 'Gig',
-          seller: booking.freelancer?.fullName || 'Freelancer',
-          price: booking.price,
-          date: booking.createdAt ? new Date(booking.createdAt).toISOString().slice(0, 10) : '',
-          details: booking.notes || '',
-          status: booking.status || 'confirmed',
-          confirmationReference: booking.confirmationReference,
-        })),
-      )
-    } catch (error) {
-      setBookings([])
-      setSuccessMessage(error.message)
-    }
-  }
-
-  async function loadTransactions() {
-    try {
-      const data = await apiRequest('/api/transactions/mine')
-      setTransactions(data.transactions || [])
-    } catch (error) {
-      setTransactions([])
-      setSuccessMessage(error.message)
-    }
-  }
-
-  async function loadIncome() {
-    try {
-      const data = await apiRequest('/api/transactions/income')
-      setIncome(data.income || {
-        currency: 'ZAR',
-        totalIncome: 0,
-        transactionCount: 0,
-        monthly: [],
-      })
-    } catch (error) {
-      setIncome({
-        currency: 'ZAR',
-        totalIncome: 0,
-        transactionCount: 0,
-        monthly: [],
-      })
-      setSuccessMessage(error.message)
-    }
+  async function refresh() {
+    applyDashboard(await loadDashboard(user.role))
   }
 
   useEffect(() => {
-    loadGigs()
+    let cancelled = false
 
-    if (user.role === 'freelancer') {
-      loadMyGigs()
-      loadIncome()
-    }
+    loadDashboard(user.role).then((data) => {
+      if (!cancelled) {
+        applyDashboard(data)
+      }
+    })
 
-    if (user.role === 'client' || user.role === 'freelancer') {
-      loadBookings()
-      loadTransactions()
+    return () => {
+      cancelled = true
     }
   }, [user.role])
 
-  const allGigs = gigs
-  const filteredGigs = allGigs.filter((gig) =>
+  const filteredGigs = gigs.filter((gig) =>
     `${gig.title} ${gig.category} ${gig.description}`
       .toLowerCase()
       .includes(search.toLowerCase()),
   )
+
+  function changeView(nextView) {
+    setNotice(null)
+    setView(nextView)
+  }
 
   function updateForm(event) {
     setForm({ ...form, [event.target.name]: event.target.value })
@@ -171,39 +190,33 @@ export default function GigBrowser({ user, onLogout }) {
 
     try {
       if (editingId) {
-        const data = await apiRequest(`/api/gigs/${editingId}`, {
+        await apiRequest(`/api/gigs/${editingId}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         })
-
-        setMyGigs((currentGigs) =>
-          currentGigs.map((gig) => (gig.id === editingId ? data.gig : gig)),
-        )
-        setSuccessMessage('Gig updated successfully.')
+        showSuccess('Gig updated successfully.')
       } else {
-        const data = await apiRequest('/api/gigs', {
+        await apiRequest('/api/gigs', {
           method: 'POST',
           body: JSON.stringify(payload),
         })
-
-        setMyGigs((currentGigs) => [data.gig, ...currentGigs])
-        setSuccessMessage('Service created successfully.')
+        showSuccess('Service created successfully.')
       }
 
       resetForm()
-      await loadGigs()
+      await refresh()
     } catch (error) {
-      setSuccessMessage(error.message)
+      showError(error.message)
     }
   }
 
   function editGig(gig) {
     setForm({
       title: gig.title,
-      category: gig.category,
+      category: categories.includes(gig.category) ? gig.category : categories[0],
       description: gig.description,
-      price: gig.price,
-      deliveryDays: gig.deliveryDays || 3,
+      price: String(gig.price),
+      deliveryDays: String(gig.deliveryDays || 3),
     })
     setEditingId(gig.id)
   }
@@ -211,34 +224,27 @@ export default function GigBrowser({ user, onLogout }) {
   async function deleteGig(gigId) {
     try {
       await apiRequest(`/api/gigs/${gigId}`, { method: 'DELETE' })
-      setMyGigs((currentGigs) => currentGigs.filter((gig) => gig.id !== gigId))
-      setSuccessMessage('Gig deleted.')
-
       if (editingId === gigId) {
         resetForm()
       }
-
-      await loadGigs()
+      showSuccess('Gig deleted.')
+      await refresh()
     } catch (error) {
-      setSuccessMessage(error.message)
+      showError(error.message)
     }
   }
 
   async function toggleGigStatus(gig) {
     try {
       const nextState = !gig.isActive
-      const data = await apiRequest(`/api/gigs/${gig.id}`, {
+      await apiRequest(`/api/gigs/${gig.id}`, {
         method: 'PUT',
         body: JSON.stringify({ isActive: nextState }),
       })
-
-      setMyGigs((currentGigs) =>
-        currentGigs.map((item) => (item.id === gig.id ? data.gig : item)),
-      )
-      setSuccessMessage(nextState ? 'Gig is now live in the marketplace.' : 'Gig is hidden from the marketplace.')
-      await loadGigs()
+      showSuccess(nextState ? 'Gig is now live in the marketplace.' : 'Gig is hidden from the marketplace.')
+      await refresh()
     } catch (error) {
-      setSuccessMessage(error.message)
+      showError(error.message)
     }
   }
 
@@ -246,8 +252,7 @@ export default function GigBrowser({ user, onLogout }) {
     setSelectedGig(gig)
     setBookingDate('')
     setProjectDetails('')
-    setSuccessMessage('')
-    setView('booking')
+    changeView('booking')
   }
 
   async function submitBooking(event) {
@@ -259,29 +264,18 @@ export default function GigBrowser({ user, onLogout }) {
         body: JSON.stringify({
           gigId: selectedGig.id,
           notes: projectDetails.trim(),
+          requestedDate: bookingDate,
         }),
       })
 
-      setBookings((currentBookings) => [
-        {
-          id: data.booking.id,
-          gigTitle: data.booking.gig?.title || selectedGig.title,
-          seller: data.booking.freelancer?.fullName || selectedGig.freelancer?.fullName || 'Freelancer',
-          price: data.booking.price,
-          date: data.booking.createdAt ? new Date(data.booking.createdAt).toISOString().slice(0, 10) : bookingDate,
-          details: data.booking.notes || projectDetails,
-          status: data.booking.status,
-          confirmationReference: data.booking.confirmationReference,
-        },
-        ...currentBookings,
-      ])
-
       setSelectedGig(null)
       setView('bookings')
-      setSuccessMessage('Booking confirmed. Payment was simulated and a transaction was recorded.')
-      await loadTransactions()
+      showSuccess(
+        `Booking confirmed (reference ${data.booking.confirmationReference}). Payment was simulated and a transaction was recorded.`,
+      )
+      await refresh()
     } catch (error) {
-      setSuccessMessage(error.message)
+      showError(error.message)
     }
   }
 
@@ -294,7 +288,7 @@ export default function GigBrowser({ user, onLogout }) {
           <button
             type="button"
             className={view === 'browse' ? 'nav-button active' : 'nav-button'}
-            onClick={() => setView('browse')}
+            onClick={() => changeView('browse')}
           >
             Browse gigs
           </button>
@@ -303,9 +297,9 @@ export default function GigBrowser({ user, onLogout }) {
             <button
               type="button"
               className={view === 'bookings' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setView('bookings')}
+              onClick={() => changeView('bookings')}
             >
-              My bookings
+              {user.role === 'client' ? 'My bookings' : 'Bookings'}
             </button>
           )}
 
@@ -313,7 +307,7 @@ export default function GigBrowser({ user, onLogout }) {
             <button
               type="button"
               className={view === 'manage' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setView('manage')}
+              onClick={() => changeView('manage')}
             >
               Manage gigs
             </button>
@@ -321,7 +315,7 @@ export default function GigBrowser({ user, onLogout }) {
         </nav>
 
         <div className="market-account">
-          <span>{user.fullName}</span>
+          <span>{decodeHtml(user.fullName)}</span>
           <button type="button" onClick={onLogout}>Log out</button>
         </div>
       </header>
@@ -330,10 +324,11 @@ export default function GigBrowser({ user, onLogout }) {
         <main className="management-content">
           <p className="market-eyebrow">Booking request</p>
           <h1>Request a service</h1>
+          <Notice notice={notice} />
 
           <section className="booking-summary">
             <h2>{selectedGig.title}</h2>
-            <p>Freelancer: {selectedGig.freelancer?.fullName || selectedGig.seller || 'Freelancer'}</p>
+            <p>Freelancer: {selectedGig.freelancer?.fullName || 'Freelancer'}</p>
             <strong>Price: R{selectedGig.price}</strong>
           </section>
 
@@ -355,19 +350,19 @@ export default function GigBrowser({ user, onLogout }) {
                 value={projectDetails}
                 onChange={(event) => setProjectDetails(event.target.value)}
                 rows={5}
-                maxLength={500}
+                maxLength={1000}
                 required
               />
             </label>
 
             <button className="auth-submit" type="submit">
-              Send booking request
+              Confirm booking
             </button>
 
             <button
               className="cancel-edit"
               type="button"
-              onClick={() => setView('browse')}
+              onClick={() => changeView('browse')}
             >
               Back to gigs
             </button>
@@ -377,15 +372,12 @@ export default function GigBrowser({ user, onLogout }) {
         <main className="management-content">
           <p className="market-eyebrow">{user.role === 'client' ? 'Client workspace' : 'Freelancer workspace'}</p>
           <h1>{user.role === 'client' ? 'My bookings' : 'Bookings on your gigs'}</h1>
-
-          {successMessage && (
-            <p className="success-message" role="status">{successMessage}</p>
-          )}
+          <Notice notice={notice} />
 
           {bookings.length === 0 ? (
             <p>
               {user.role === 'client'
-                ? 'You haven’t requested any gigs yet. Browse gigs to get started.'
+                ? 'You haven’t booked any gigs yet. Browse gigs to get started.'
                 : 'No bookings have been made on your gigs yet.'}
             </p>
           ) : (
@@ -396,29 +388,56 @@ export default function GigBrowser({ user, onLogout }) {
                     <p className="gig-category">{booking.status}</p>
                     <h3>{booking.gigTitle}</h3>
                     <p>
-                      {user.role === 'client'
-                        ? `Freelancer: ${booking.seller}`
-                        : `Client: ${booking.seller}`}
+                      {user.role === 'client' ? 'Freelancer' : 'Client'}: {booking.otherParty}
                     </p>
                     {booking.confirmationReference && (
                       <p>Reference: {booking.confirmationReference}</p>
                     )}
-                    <p>Requested date: {booking.date}</p>
-                    <p>{booking.details}</p>
+                    {booking.requestedDate && <p>Requested date: {booking.requestedDate}</p>}
+                    <p>Booked on: {booking.bookedOn}</p>
+                    {booking.details && <p>{booking.details}</p>}
                     <strong>R{booking.price}</strong>
                   </div>
                 </article>
               ))}
             </div>
           )}
+
+          <section className="transaction-list">
+            <h2>Transactions</h2>
+            {transactions.length === 0 ? (
+              <p>No transactions recorded yet.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Gig</th>
+                    <th scope="col">{user.role === 'client' ? 'Freelancer' : 'Client'}</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td>{transaction.date}</td>
+                      <td>{transaction.gigTitle}</td>
+                      <td>{user.role === 'client' ? transaction.freelancer : transaction.client}</td>
+                      <td>R{transaction.amount}</td>
+                      <td>{transaction.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
         </main>
       ) : view === 'manage' && user.role === 'freelancer' ? (
         <main className="management-content">
           <p className="market-eyebrow">Freelancer workspace</p>
           <h1>Manage your gigs</h1>
-          {successMessage && (
-            <p className="success-message" role="status">{successMessage}</p>
-          )}
+          <Notice notice={notice} />
 
           <div className="income-summary">
             <h2>Income summary</h2>
@@ -453,6 +472,7 @@ export default function GigBrowser({ user, onLogout }) {
                   name="title"
                   value={form.title}
                   onChange={updateForm}
+                  minLength={3}
                   maxLength={100}
                   required
                 />
@@ -478,7 +498,8 @@ export default function GigBrowser({ user, onLogout }) {
                   value={form.description}
                   onChange={updateForm}
                   rows={4}
-                  maxLength={300}
+                  minLength={10}
+                  maxLength={2000}
                   required
                 />
               </label>
@@ -489,6 +510,7 @@ export default function GigBrowser({ user, onLogout }) {
                   name="price"
                   type="number"
                   min="1"
+                  max="1000000"
                   step="1"
                   value={form.price}
                   onChange={updateForm}
@@ -562,10 +584,11 @@ export default function GigBrowser({ user, onLogout }) {
         </main>
       ) : (
         <main className="market-content">
-          <p className="dashboard-greeting">Welcome, {user.fullName}!</p>
+          <p className="dashboard-greeting">Welcome, {decodeHtml(user.fullName)}!</p>
 
           <p className="market-eyebrow">Find independent talent</p>
           <h1>Browse freelance services</h1>
+          <Notice notice={notice} />
 
           <label className="search-label">
             Search gigs
@@ -590,7 +613,7 @@ export default function GigBrowser({ user, onLogout }) {
                   <h3>{gig.title}</h3>
                   <p className="gig-description">{gig.description}</p>
                   <div className="gig-footer">
-                    <span>{gig.freelancer?.fullName || gig.seller || 'Freelancer'}</span>
+                    <span>{gig.freelancer?.fullName || 'Freelancer'}</span>
                     <strong>From R{gig.price}</strong>
                   </div>
 

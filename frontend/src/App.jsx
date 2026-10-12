@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import GigBrowser from './GigBrowser.jsx'
+import { apiRequest, setUnauthorizedHandler } from './api.js'
 
 function App() {
   const [mode,setMode] = useState('login')
@@ -18,7 +19,31 @@ function App() {
 
   const isRegistering = mode === 'register'
 
-  async function handleSubmint(event){
+  function logout(nextMessage = '') {
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('user')
+    setUser(null)
+    setEmail('')
+    setPassword('')
+    setFullName('')
+    setRole('client')
+    setMode('login')
+    setMessage(nextMessage)
+  }
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('user')
+      setUser(null)
+      setPassword('')
+      setMode('login')
+      setMessage('Your session has expired. Please log in again.')
+    })
+    return () => setUnauthorizedHandler(null)
+  }, [])
+
+  async function handleSubmit(event){
     event.preventDefault()
     setMessage('')
     setLoading(true)
@@ -35,17 +60,10 @@ function App() {
         requestBody.role = role
       }
 
-      const response = await fetch(path, {
+      const data = await apiRequest(path, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(requestBody),
       })
-
-      const data = await response.json()
-
-      if (!response.ok){
-        throw new Error(data.error?.message || 'Request failed')
-      }
 
       sessionStorage.setItem('token', data.token)
       sessionStorage.setItem('user', JSON.stringify(data.user))
@@ -66,17 +84,7 @@ function App() {
     return(
       <GigBrowser
       user={user}
-      onLogout={() => {
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('user')
-        setUser(null)
-        setEmail('')
-        setPassword('')
-        setFullName('')
-        setRole('client')
-        setMode('login')
-        setMessage('')
-      }}
+      onLogout={() => logout()}
       />
     )
   }
@@ -92,7 +100,7 @@ function App() {
       <section className="auth-panel">
       <p className="market-eyebrow">Welcome to HustleHub</p>
       <h1>
-        {isRegistering ? 'Create a your account':   'Welcome back'}
+        {isRegistering ? 'Create your account' : 'Welcome back'}
       </h1>
       <p className="auth-intro">
         {isRegistering
@@ -100,7 +108,7 @@ function App() {
           : 'Log in to find your next opportunity.'}
       </p>
 
-      <form className="auth-form" onSubmit={handleSubmint} >
+      <form className="auth-form" onSubmit={handleSubmit}>
         {isRegistering && (
           <>
             <label className="auth-field">
@@ -118,7 +126,7 @@ function App() {
             </label>
 
             <label className="auth-field">
-              I am joinging as
+              I am joining as
               <select                 
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
@@ -181,7 +189,7 @@ function App() {
 
       <button className="auth-switch" type="button" onClick={switchMode}>
         {isRegistering
-          ? 'Already registerd? Log in'
+          ? 'Already registered? Log in'
           : 'Need an account? Register'}
       </button>
     </section>
