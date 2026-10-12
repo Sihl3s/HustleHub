@@ -28,6 +28,8 @@ express-rate-limit (2025) *express-rate-limit: basic rate-limiting middleware fo
 
 MDN (2025) *Content Security Policy (CSP)*. Mozilla Developer Network. Available at: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP (Accessed: 10 October 2026).
 
+MDN (2026) *Using the Fetch API*. Mozilla Developer Network. Available at: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch (Accessed: 11 October 2026).
+
 OWASP (2025e) *Injection prevention cheat sheet*. Available at: https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html (Accessed: 10 October 2026).
 
 OWASP (2025f) *Cross site scripting prevention cheat sheet*. Available at: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html (Accessed: 10 October 2026).
@@ -35,5 +37,3 @@ OWASP (2025f) *Cross site scripting prevention cheat sheet*. Available at: https
 OWASP (2025g) *Content security policy cheat sheet*. Available at: https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html (Accessed: 10 October 2026).
 
 OWASP (2025h) *Authorization cheat sheet*. Available at: https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html (Accessed: 10 October 2026).
-
-React (2026) Using the Fetch API, MDN Web Docs. Available at: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch (Accessed: October 11, 2026).
