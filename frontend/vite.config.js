@@ -53,4 +53,8 @@ export default defineConfig({
     headers: { ...sharedHeaders, 'Content-Security-Policy': productionCsp },
     proxy: apiProxy,
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+  },
 })
