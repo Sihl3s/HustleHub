@@ -47,6 +47,10 @@
       "value": ""
     },
     {
+      "key": "requestedDate",
+      "value": ""
+    },
+    {
       "key": "tamperedToken",
       "value": ""
     }
@@ -712,6 +716,16 @@
           "name": "Client books a gig (201)",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);",
+                  "pm.collectionVariables.set('requestedDate', nextWeek.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
@@ -724,6 +738,7 @@
                   "});",
                   "pm.test('Price comes from the gig, not the client', () => pm.expect(booking.price).to.eql(1800));",
                   "pm.test('A transaction was recorded for the booking', () => pm.expect(booking.transaction.amount).to.eql(1800));",
+                  "pm.test('The requested date is stored', () => pm.expect(booking.requestedDate.slice(0, 10)).to.eql(pm.collectionVariables.get('requestedDate')));",
                   "pm.collectionVariables.set('bookingId', booking.id);"
                 ]
               }
@@ -750,7 +765,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"gigId\": \"{{gigId}}\",\n  \"notes\": \"Please include a contact form.\"\n}"
+              "raw": "{\n  \"gigId\": \"{{gigId}}\",\n  \"notes\": \"Please include a contact form.\",\n  \"requestedDate\": \"{{requestedDate}}\"\n}"
             }
           },
           "response": []

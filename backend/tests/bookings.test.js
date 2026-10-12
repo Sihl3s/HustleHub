@@ -114,6 +114,44 @@ describe('creating bookings', () => {
     expect(res.status).toBe(201);
     expect(res.body.booking.notes).not.toContain('<img');
   });
+
+  test('a requested date in the near future is stored with the booking', async () => {
+    const freelancer = await registerUser('f@example.com', 'freelancer');
+    const client = await registerUser('c@example.com', 'client');
+    const gig = await createGig(freelancer.token);
+    const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const res = await request(app)
+      .post('/api/bookings')
+      .set(bearer(client.token))
+      .send({ gigId: gig.id, requestedDate: nextWeek });
+
+    expect(res.status).toBe(201);
+    expect(res.body.booking.requestedDate.slice(0, 10)).toBe(nextWeek);
+
+    const mine = await request(app).get('/api/bookings/mine').set(bearer(client.token));
+    expect(mine.body.bookings[0].requestedDate.slice(0, 10)).toBe(nextWeek);
+  });
+
+  test('past, far-future and malformed requested dates are rejected', async () => {
+    const freelancer = await registerUser('f@example.com', 'freelancer');
+    const client = await registerUser('c@example.com', 'client');
+    const gig = await createGig(freelancer.token);
+    const send = (requestedDate) =>
+      request(app).post('/api/bookings').set(bearer(client.token)).send({ gigId: gig.id, requestedDate });
+
+    const past = await send('2020-01-01');
+    const farFuture = await send(new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10));
+    const malformed = await send('next tuesday');
+
+    expect(past.status).toBe(400);
+    expect(past.body.error.details).toEqual([
+      { field: 'requestedDate', message: 'Requested date cannot be in the past' },
+    ]);
+    expect(farFuture.status).toBe(400);
+    expect(malformed.status).toBe(400);
+    expect(await mongoose.model('Booking').countDocuments()).toBe(0);
+  });
 });
 
 describe('viewing bookings, transactions and income', () => {
@@ -157,6 +195,26 @@ describe('viewing bookings, transactions and income', () => {
     expect(clientTx.body.transactions).toHaveLength(3);
     const fionaTx = await request(app).get('/api/transactions/mine').set(bearer(fiona.token));
     expect(fionaTx.body.transactions).toHaveLength(2);
+  });
+
+  test('booking and transaction history still loads after the gig is deleted', async () => {
+    const freelancer = await registerUser('f@example.com', 'freelancer');
+    const client = await registerUser('c@example.com', 'client');
+    const gig = await createGig(freelancer.token);
+    await book(client.token, gig.id);
+
+    const deleted = await request(app).delete(`/api/gigs/${gig.id}`).set(bearer(freelancer.token));
+    expect(deleted.status).toBe(200);
+
+    const bookings = await request(app).get('/api/bookings/mine').set(bearer(client.token));
+    const transactions = await request(app).get('/api/transactions/mine').set(bearer(client.token));
+    const income = await request(app).get('/api/transactions/income').set(bearer(freelancer.token));
+
+    expect(bookings.status).toBe(200);
+    expect(bookings.body.bookings[0].gig.title).toBe('Deleted gig');
+    expect(transactions.status).toBe(200);
+    expect(transactions.body.transactions[0].gig).toEqual({ id: gig.id, title: 'Deleted gig' });
+    expect(income.body.income.totalIncome).toBe(250);
   });
 
   test('a freelancer with no bookings has zero income', async () => {

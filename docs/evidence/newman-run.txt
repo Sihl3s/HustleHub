@@ -8,190 +8,191 @@ HustleHub+ Part 2 API
 
 □ 1. Authentication
 └ Health check (200)
-  GET https://127.0.0.1:27792/health [200 OK, 671B, 80ms]
+  GET https://127.0.0.1:32656/health [200 OK, 671B, 153ms]
   √  Status is 200
   √  API is up
 
 └ Register freelancer (201)
-  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.33kB, 567ms]
+  POST https://127.0.0.1:32656/api/auth/register [201 Created, 1.33kB, 734ms]
   √  Status is 201
   √  Returns a JWT and no password hash
 
 └ Register second freelancer (201)
-  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.33kB, 461ms]
+  POST https://127.0.0.1:32656/api/auth/register [201 Created, 1.33kB, 513ms]
   √  Status is 201
 
 └ Register client (201)
-  POST https://127.0.0.1:27792/api/auth/register [201 Created, 1.31kB, 423ms]
+  POST https://127.0.0.1:32656/api/auth/register [201 Created, 1.31kB, 497ms]
   √  Status is 201
 
 └ Register invalid input (400)
-  POST https://127.0.0.1:27792/api/auth/register [400 Bad Request, 1.11kB, 20ms]
+  POST https://127.0.0.1:32656/api/auth/register [400 Bad Request, 1.11kB, 22ms]
   √  Status is 400
   √  Lists the invalid fields
   √  Error does not leak internals
 
 └ Register duplicate email (409)
-  POST https://127.0.0.1:27792/api/auth/register [409 Conflict, 818B, 33ms]
+  POST https://127.0.0.1:32656/api/auth/register [409 Conflict, 818B, 44ms]
   √  Status is 409
 
 └ Register as admin is refused (400)
-  POST https://127.0.0.1:27792/api/auth/register [400 Bad Request, 882B, 15ms]
+  POST https://127.0.0.1:32656/api/auth/register [400 Bad Request, 882B, 24ms]
   √  Status is 400
 
 └ Login success (200)
-  POST https://127.0.0.1:27792/api/auth/login [200 OK, 1.32kB, 438ms]
+  POST https://127.0.0.1:32656/api/auth/login [200 OK, 1.32kB, 527ms]
   √  Status is 200
   √  Returns a JWT
 
 └ Login wrong password (401)
-  POST https://127.0.0.1:27792/api/auth/login [401 Unauthorized, 806B, 598ms]
+  POST https://127.0.0.1:32656/api/auth/login [401 Unauthorized, 806B, 536ms]
   √  Status is 401
   √  Generic message does not reveal which part was wrong
 
 └ Get me with token (200)
-  GET https://127.0.0.1:27792/api/me [200 OK, 926B, 41ms]
+  GET https://127.0.0.1:32656/api/me [200 OK, 926B, 31ms]
   √  Status is 200
   √  Returns the logged-in user
 
 └ Get me without token (401)
-  GET https://127.0.0.1:27792/api/me [401 Unauthorized, 807B, 40ms]
+  GET https://127.0.0.1:32656/api/me [401 Unauthorized, 807B, 45ms]
   √  Status is 401
 
 □ 2. Gigs
 └ Freelancer creates gig (201)
-  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.16kB, 131ms]
+  POST https://127.0.0.1:32656/api/gigs [201 Created, 1.16kB, 75ms]
   √  Status is 201
   √  Gig is owned by the logged-in freelancer
 
 └ Client browses gigs (200)
-  GET https://127.0.0.1:27792/api/gigs?search=website [200 OK, 1.17kB, 81ms]
+  GET https://127.0.0.1:32656/api/gigs?search=website [200 OK, 1.17kB, 51ms]
   √  Status is 200
   √  Finds the new gig
 
 └ Client views gig by id (200)
-  GET https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [200 OK, 1.13kB, 40ms]
+  GET https://127.0.0.1:32656/api/gigs/6acca9fc2459b8880c64bed0 [200 OK, 1.13kB, 30ms]
   √  Status is 200
 
 └ Freelancer lists own gigs (200)
-  GET https://127.0.0.1:27792/api/gigs/mine [200 OK, 1.14kB, 44ms]
+  GET https://127.0.0.1:32656/api/gigs/mine [200 OK, 1.14kB, 27ms]
   √  Status is 200
   √  Has at least one gig
 
 └ Freelancer updates own gig (200)
-  PUT https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [200 OK, 1.15kB, 52ms]
+  PUT https://127.0.0.1:32656/api/gigs/6acca9fc2459b8880c64bed0 [200 OK, 1.15kB, 56ms]
   √  Status is 200
   √  Price updated
 
 └ Create gig with invalid data (400)
-  POST https://127.0.0.1:27792/api/gigs [400 Bad Request, 1.22kB, 24ms]
+  POST https://127.0.0.1:32656/api/gigs [400 Bad Request, 1.22kB, 18ms]
   √  Status is 400
   √  Error does not leak internals
 
 └ Freelancer creates a gig to delete (201)
-  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.16kB, 48ms]
+  POST https://127.0.0.1:32656/api/gigs [201 Created, 1.16kB, 39ms]
   √  Status is 201
 
 └ Freelancer deletes own gig (200)
-  DELETE https://127.0.0.1:27792/api/gigs/6aca22978415beb434e0695f [200 OK, 772B, 36ms]
+  DELETE https://127.0.0.1:32656/api/gigs/6acca9fc2459b8880c64bede [200 OK, 772B, 49ms]
   √  Status is 200
 
 □ 3. Bookings and transactions
 └ Client books a gig (201)
-  POST https://127.0.0.1:27792/api/bookings [201 Created, 1.36kB, 55ms]
+  POST https://127.0.0.1:32656/api/bookings [201 Created, 1.41kB, 55ms]
   √  Status is 201
   √  Booking is confirmed with a reference
   √  Price comes from the gig, not the client
   √  A transaction was recorded for the booking
+  √  The requested date is stored
 
 └ Client lists own bookings (200)
-  GET https://127.0.0.1:27792/api/bookings/mine [200 OK, 1.28kB, 40ms]
+  GET https://127.0.0.1:32656/api/bookings/mine [200 OK, 1.32kB, 31ms]
   √  Status is 200
   √  Contains the booking
 
 └ Freelancer lists bookings on their gigs (200)
-  GET https://127.0.0.1:27792/api/bookings/mine [200 OK, 1.28kB, 34ms]
+  GET https://127.0.0.1:32656/api/bookings/mine [200 OK, 1.32kB, 31ms]
   √  Status is 200
   √  Freelancer sees the client booking
 
 └ Client views booking by id (200)
-  GET https://127.0.0.1:27792/api/bookings/6aca22978415beb434e06967 [200 OK, 1.27kB, 34ms]
+  GET https://127.0.0.1:32656/api/bookings/6acca9fd2459b8880c64bee6 [200 OK, 1.32kB, 35ms]
   √  Status is 200
 
 └ Client lists own transactions (200)
-  GET https://127.0.0.1:27792/api/transactions/mine [200 OK, 1.13kB, 27ms]
+  GET https://127.0.0.1:32656/api/transactions/mine [200 OK, 1.13kB, 35ms]
   √  Status is 200
   √  Has one transaction
 
 └ Freelancer lists own transactions (200)
-  GET https://127.0.0.1:27792/api/transactions/mine [200 OK, 1.13kB, 31ms]
+  GET https://127.0.0.1:32656/api/transactions/mine [200 OK, 1.13kB, 26ms]
   √  Status is 200
   √  Transaction is linked to the booking
 
 └ Freelancer income summary (200)
-  GET https://127.0.0.1:27792/api/transactions/income [200 OK, 887B, 42ms]
+  GET https://127.0.0.1:32656/api/transactions/income [200 OK, 887B, 40ms]
   √  Status is 200
   √  Income reflects the booking
 
 □ 4. Security and access control
 └ Gigs without token (401)
-  GET https://127.0.0.1:27792/api/gigs [401 Unauthorized, 807B, 95ms]
+  GET https://127.0.0.1:32656/api/gigs [401 Unauthorized, 807B, 39ms]
   √  Status is 401
 
 └ Tampered JWT is rejected (401)
-  POST https://127.0.0.1:27792/api/gigs [401 Unauthorized, 808B, 46ms]
+  POST https://127.0.0.1:32656/api/gigs [401 Unauthorized, 808B, 42ms]
   √  Status is 401
 
 └ Client cannot create a gig (403)
-  POST https://127.0.0.1:27792/api/gigs [403 Forbidden, 830B, 40ms]
+  POST https://127.0.0.1:32656/api/gigs [403 Forbidden, 830B, 38ms]
   √  Status is 403
 
 └ Other freelancer cannot update the gig (403)
-  PUT https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [403 Forbidden, 811B, 52ms]
+  PUT https://127.0.0.1:32656/api/gigs/6acca9fc2459b8880c64bed0 [403 Forbidden, 811B, 42ms]
   √  Status is 403
 
 └ Other freelancer cannot delete the gig (403)
-  DELETE https://127.0.0.1:27792/api/gigs/6aca22968415beb434e06951 [403 Forbidden, 811B, 45ms]
+  DELETE https://127.0.0.1:32656/api/gigs/6acca9fc2459b8880c64bed0 [403 Forbidden, 811B, 45ms]
   √  Status is 403
 
 └ Freelancer cannot book a gig (403)
-  POST https://127.0.0.1:27792/api/bookings [403 Forbidden, 830B, 37ms]
+  POST https://127.0.0.1:32656/api/bookings [403 Forbidden, 830B, 34ms]
   √  Status is 403
 
 └ Outsider cannot view the booking (404)
-  GET https://127.0.0.1:27792/api/bookings/6aca22978415beb434e06967 [404 Not Found, 798B, 44ms]
+  GET https://127.0.0.1:32656/api/bookings/6acca9fd2459b8880c64bee6 [404 Not Found, 798B, 202ms]
   √  Status is 404
 
 └ Client cannot view income summary (403)
-  GET https://127.0.0.1:27792/api/transactions/income [403 Forbidden, 830B, 45ms]
+  GET https://127.0.0.1:32656/api/transactions/income [403 Forbidden, 830B, 110ms]
   √  Status is 403
 
 └ Client cannot set the booking price (400)
-  POST https://127.0.0.1:27792/api/bookings [400 Bad Request, 809B, 35ms]
+  POST https://127.0.0.1:32656/api/bookings [400 Bad Request, 809B, 56ms]
   √  Status is 400
   √  Unexpected fields are refused
 
 └ NoSQL injection in login is rejected (400)
-  POST https://127.0.0.1:27792/api/auth/login [400 Bad Request, 716B, 29ms]
+  POST https://127.0.0.1:32656/api/auth/login [400 Bad Request, 716B, 96ms]
   √  Status is 400
   √  No token issued
 
 └ XSS in gig title is escaped (201)
-  POST https://127.0.0.1:27792/api/gigs [201 Created, 1.18kB, 34ms]
+  POST https://127.0.0.1:32656/api/gigs [201 Created, 1.18kB, 72ms]
   √  Status is 201
   √  Script tags are stored escaped
 
 └ Malformed JSON is handled safely (400)
-  POST https://127.0.0.1:27792/api/auth/login [400 Bad Request, 693B, 37ms]
+  POST https://127.0.0.1:32656/api/auth/login [400 Bad Request, 693B, 48ms]
   √  Status is 400
   √  Error does not leak internals
 
 └ Invalid id is rejected (400)
-  GET https://127.0.0.1:27792/api/gigs/not-a-real-id [400 Bad Request, 857B, 17ms]
+  GET https://127.0.0.1:32656/api/gigs/not-a-real-id [400 Bad Request, 857B, 38ms]
   √  Status is 400
 
 └ Security headers are present
-  GET https://127.0.0.1:27792/api/gigs [200 OK, 1.56kB, 26ms]
+  GET https://127.0.0.1:32656/api/gigs [200 OK, 1.56kB, 43ms]
   √  Status is 200
   √  Content-Security-Policy is set
   √  nosniff is set
@@ -209,13 +210,13 @@ HustleHub+ Part 2 API
 ├─────────────────────────┼────────────────────┼────────────────────┤
 │            test-scripts │                 40 │                  0 │
 ├─────────────────────────┼────────────────────┼────────────────────┤
-│      prerequest-scripts │                  1 │                  0 │
+│      prerequest-scripts │                  2 │                  0 │
 ├─────────────────────────┼────────────────────┼────────────────────┤
-│              assertions │                 70 │                  0 │
+│              assertions │                 71 │                  0 │
 ├─────────────────────────┴────────────────────┴────────────────────┤
-│ total run duration: 7.4s                                          │
+│ total run duration: 8.3s                                          │
 ├───────────────────────────────────────────────────────────────────┤
-│ total data received: 11.06kB (approx)                             │
+│ total data received: 11.23kB (approx)                             │
 ├───────────────────────────────────────────────────────────────────┤
-│ average response time: 100ms [min: 15ms, max: 598ms, s.d.: 153ms] │
+│ average response time: 115ms [min: 18ms, max: 734ms, s.d.: 174ms] │
 └───────────────────────────────────────────────────────────────────┘
