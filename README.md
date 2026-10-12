@@ -473,7 +473,7 @@ The tests render the real React components in a simulated browser (jsdom) with a
 # Evidence and Demonstration Videos
 
 - **Part 1 demo video:** https://youtu.be/ZT6XeQMRhIE
-- **Part 2 demo video:** _link to be added_
+- **Part 2 demo video:** https://youtu.be/M-qCpdE5P2A
 - **Newman execution evidence:** [docs/evidence/newman-run.txt](docs/evidence/newman-run.txt), [docs/evidence/newman-junit.xml](docs/evidence/newman-junit.xml) and the server's security event log [docs/evidence/newman-server-events.jsonl](docs/evidence/newman-server-events.jsonl)
 - **Part 2 Postman screenshots:** the `docs/evidence/Screenshot 2026-10-11 *.png` files show the collection run in Postman with every test passing
 - **Frontend test evidence:** [docs/evidence/frontend-tests.txt](docs/evidence/frontend-tests.txt)
