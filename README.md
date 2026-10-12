@@ -24,6 +24,7 @@ HustleHub+ handles sensitive information such as **user credentials, transaction
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [Testing](#testing)
+- [Application Screenshots](#application-screenshots)
 - [Evidence and Demonstration Videos](#evidence-and-demonstration-videos)
 - [Authors](#authors)
 - [Reference List](#reference-list)
@@ -351,7 +352,8 @@ HustleHub/
 └── docs/
     ├── architecture.md              # Part 2 architecture and booking flow diagrams
     ├── evidence/                    # Newman, Postman and frontend test evidence
-    └── images/
+    ├── images/                      # architecture diagrams
+    └── screenshots/                 # screenshots of the running application
 ```
 
 ---
@@ -470,6 +472,56 @@ The tests render the real React components in a simulated browser (jsdom) with a
 
 ---
 
+# Application Screenshots
+
+Screenshots of the running application (React frontend on Vite, HTTPS API and a local MongoDB database). The walkthrough uses a freelancer (Fiona Mokoena), a second freelancer (Thabo Nkosi) and a client (Lerato Khumalo). All images are in [docs/screenshots/](docs/screenshots/).
+
+### Authentication
+
+| Login | Registration (client or freelancer only, no admin option) |
+|---|---|
+| ![Login screen](docs/screenshots/01-login.png) | ![Registering a freelancer](docs/screenshots/02-register-freelancer.png) |
+
+### Freelancer: gig management
+
+| Creating a gig | Gig list after creating gigs |
+|---|---|
+| ![Freelancer creating a gig](docs/screenshots/03-freelancer-create-gig.png) | ![Freelancer gig list](docs/screenshots/04-freelancer-my-gigs.png) |
+
+| Editing a gig (stored text loads back as readable text) |
+|---|
+| ![Freelancer editing a gig](docs/screenshots/13-freelancer-edit-gig.png) |
+
+### Client: browsing and booking
+
+| Marketplace (clients have no "Manage gigs" option) | Searching gigs |
+|---|---|
+| ![Client browsing gigs](docs/screenshots/05-client-browse-gigs.png) | ![Client searching gigs](docs/screenshots/06-client-search-gigs.png) |
+
+| Booking form with requested date | Booking confirmed with a reference and a recorded transaction |
+|---|---|
+| ![Client booking form](docs/screenshots/07-client-booking-form.png) | ![Booking confirmation](docs/screenshots/08-client-booking-confirmed.png) |
+
+| Client's bookings | Client's transactions |
+|---|---|
+| ![Client bookings list](docs/screenshots/09-client-my-bookings.png) | ![Client transactions table](docs/screenshots/10-client-transactions.png) |
+
+### Freelancer: bookings and income
+
+| Bookings on the freelancer's own gigs only, with the client's name | Income summary from the freelancer's transactions |
+|---|---|
+| ![Freelancer bookings](docs/screenshots/11-freelancer-bookings.png) | ![Freelancer income summary](docs/screenshots/12-freelancer-income-summary.png) |
+
+The logo gig was booked at R850 and its price was later changed to R950. The booking and income still show R850, because the price is taken from the gig at booking time and the client can never set it.
+
+### Security in the interface
+
+| XSS attempt in a gig title is stored escaped and shown as plain text; the script never runs | Wrong password gives a generic message | Duplicate email is rejected |
+|---|---|---|
+| ![XSS shown as text](docs/screenshots/14-xss-shown-as-text.png) | ![Wrong password error](docs/screenshots/15-login-wrong-password.png) | ![Duplicate email error](docs/screenshots/16-register-duplicate-email.png) |
+
+---
+
 # Evidence and Demonstration Videos
 
 - **Part 1 demo video:** https://youtu.be/ZT6XeQMRhIE
@@ -477,6 +529,7 @@ The tests render the real React components in a simulated browser (jsdom) with a
 - **Newman execution evidence:** [docs/evidence/newman-run.txt](docs/evidence/newman-run.txt), [docs/evidence/newman-junit.xml](docs/evidence/newman-junit.xml) and the server's security event log [docs/evidence/newman-server-events.jsonl](docs/evidence/newman-server-events.jsonl)
 - **Part 2 Postman screenshots:** the `docs/evidence/Screenshot 2026-10-11 *.png` files show the collection run in Postman with every test passing
 - **Frontend test evidence:** [docs/evidence/frontend-tests.txt](docs/evidence/frontend-tests.txt)
+- **Application screenshots:** [docs/screenshots/](docs/screenshots/) (see [Application Screenshots](#application-screenshots))
 - **Part 1 Postman screenshots:** the `Screenshot 2026-09-07 *.png` files in the repository root
 
 ---
