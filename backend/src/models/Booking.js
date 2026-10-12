@@ -12,6 +12,7 @@ const bookingSchema = new mongoose.Schema(
     freelancer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     price: { type: Number, required: true, min: 0 },
     notes: { type: String, trim: true, maxlength: 1000, default: '' },
+    requestedDate: { type: Date },
     status: {
       type: String,
       enum: ['pending', 'confirmed', 'completed', 'cancelled'],

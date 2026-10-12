@@ -55,6 +55,7 @@ function toPublicBooking(booking, transaction) {
     freelancer: toPublicParty(booking.freelancer),
     price: booking.price,
     notes: booking.notes,
+    requestedDate: booking.requestedDate || null,
     status: booking.status,
     transaction: transaction
       ? { id: transaction._id.toString(), amount: transaction.amount, status: transaction.status }
@@ -72,7 +73,7 @@ function populateBooking(query) {
 
 async function createBooking(req, res, next) {
   try {
-    const { gigId, notes } = req.body;
+    const { gigId, notes, requestedDate } = req.body;
     const gig = await Gig.findById(gigId);
 
     if (!gig || !gig.isActive) {
@@ -89,6 +90,7 @@ async function createBooking(req, res, next) {
       freelancer: gig.freelancer,
       price: gig.price,
       notes: notes || '',
+      requestedDate,
       status: 'confirmed',
     });
 
