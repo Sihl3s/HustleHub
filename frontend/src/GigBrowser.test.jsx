@@ -74,7 +74,7 @@ describe('GigBrowser role-based views', () => {
     expect(await screen.findByText('2 services')).toBeInTheDocument()
     await user.type(screen.getByLabelText('Search gigs'), 'website')
 
-    expect(screen.getByText('1 services')).toBeInTheDocument()
+    expect(screen.getByText('1 service')).toBeInTheDocument()
     expect(screen.queryByText('Logo & brand kit')).not.toBeInTheDocument()
   })
 })
