@@ -28,6 +28,11 @@ const transactionRoutes = require('./routes/transactions');
 
 const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
+// HSTS is on in production unless ENABLE_HSTS=false (used by Docker Compose,
+// where the browser reaches the app over plain HTTP on the published port).
+const enableHsts = process.env.ENABLE_HSTS
+  ? process.env.ENABLE_HSTS === 'true'
+  : isProduction;
 
 app.disable('x-powered-by');
 
@@ -45,7 +50,7 @@ app.use(
     frameguard: { action: 'deny' },
     referrerPolicy: { policy: 'no-referrer' },
     crossOriginResourcePolicy: { policy: 'same-origin' },
-    hsts: isProduction ? { maxAge: 31536000, includeSubDomains: true } : false,
+    hsts: enableHsts ? { maxAge: 31536000, includeSubDomains: true } : false,
   })
 );
 

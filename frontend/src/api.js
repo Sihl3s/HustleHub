@@ -35,7 +35,12 @@ export async function apiRequest(url, options = {}) {
   const data = contentType.includes('application/json') ? await response.json() : {}
 
   if (!response.ok) {
-    if (response.status === 401 && headers.Authorization && unauthorizedHandler) {
+    if (
+      response.status === 401
+      && headers.Authorization
+      && unauthorizedHandler
+      && !options.skipUnauthorized
+    ) {
       unauthorizedHandler()
     }
     throw new Error(errorMessage(data))

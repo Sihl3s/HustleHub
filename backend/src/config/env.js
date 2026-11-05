@@ -27,6 +27,8 @@ function requireJwtSecret() {
 function loadEnv() {
   return {
     port: Number(process.env.PORT) || 3443,
+    // Local npm start stays on localhost. Docker Compose sets 0.0.0.0.
+    bindHost: process.env.BIND_HOST || '127.0.0.1',
     jwtSecret: requireJwtSecret(),
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
     jwtIssuer: process.env.JWT_ISSUER || 'hustlehub-api',

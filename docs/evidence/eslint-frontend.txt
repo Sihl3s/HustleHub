@@ -1,0 +1,6 @@
+Static analysis: frontend ESLint
+Command: npx eslint . --max-warnings 0
+Working directory: frontend
+Result: passed, exit code 0. ESLint printed no findings.
+
+What this means: the recommended JavaScript and React rules found no unused variables, undefined names or hook mistakes in the client. A clean result means those checks passed. It does not replace the Content Security Policy, output escaping or the security review in the README.

@@ -119,6 +119,16 @@ async function createBooking(req, res, next) {
       transactionId: transaction.id,
     });
 
+    // A separate transaction event makes payment records easy to trace
+    // without reading the booking line (OWASP, 2025b).
+    logEvent('info', 'transaction_recorded', {
+      userId: req.user.id,
+      transactionId: transaction.id,
+      bookingId: booking.id,
+      amount: transaction.amount,
+      currency: 'ZAR',
+    });
+
     return res.status(201).json({
       message: 'Booking confirmed. Payment was simulated and a transaction was recorded.',
       booking: toPublicBooking(saved, transaction),

@@ -19,7 +19,15 @@ function App() {
 
   const isRegistering = mode === 'register'
 
-  function logout(nextMessage = '') {
+  async function logout(nextMessage = '') {
+    if (sessionStorage.getItem('token')) {
+      try {
+        await apiRequest('/api/auth/logout', { method: 'POST', skipUnauthorized: true })
+      } catch {
+        // The browser session is cleared even when the API cannot be reached.
+      }
+    }
+
     sessionStorage.removeItem('token')
     sessionStorage.removeItem('user')
     setUser(null)

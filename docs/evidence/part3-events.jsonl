@@ -1,0 +1,8 @@
+{"timestamp":"2026-11-05T11:10:22.856Z","level":"info","event":"login_failed"}
+{"timestamp":"2026-11-05T11:10:22.875Z","level":"info","event":"login_success","userId":"user-1","role":"freelancer"}
+{"timestamp":"2026-11-05T11:10:22.882Z","level":"info","event":"account_locked","userId":"user-1"}
+{"timestamp":"2026-11-05T11:10:22.891Z","level":"info","event":"login_blocked_locked","userId":"user-1"}
+{"timestamp":"2026-11-05T11:10:22.901Z","level":"info","event":"booking_created","userId":"client-1","bookingId":"booking-1","gigId":"gig-1","transactionId":"txn-1"}
+{"timestamp":"2026-11-05T11:10:22.910Z","level":"info","event":"transaction_recorded","userId":"client-1","transactionId":"txn-1","bookingId":"booking-1","amount":850,"currency":"ZAR"}
+{"timestamp":"2026-11-05T11:10:22.921Z","level":"info","event":"logout","userId":"user-1"}
+{"timestamp":"2026-11-05T11:10:22.928Z","level":"error","event":"request_failed","method":"POST","path":"/api/bookings","statusCode":500,"message":"An unexpected error occurred"}

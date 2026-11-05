@@ -33,6 +33,8 @@ function signAccessToken(user) {
       email: user.email,
       role: user.role,
       fullName: user.fullName,
+      // Bumped on logout so a copied token cannot be reused (OWASP, 2025i).
+      tokenVersion: Number.isInteger(user.tokenVersion) ? user.tokenVersion : 0,
     },
     jwtSecret,
     {
@@ -69,6 +71,7 @@ function verifyAccessToken(token) {
       email: payload.email,
       role: payload.role,
       fullName: payload.fullName,
+      tokenVersion: Number.isInteger(payload.tokenVersion) ? payload.tokenVersion : 0,
     };
   } catch (err) {
     if (err instanceof AppError) {

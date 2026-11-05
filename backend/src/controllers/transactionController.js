@@ -8,6 +8,7 @@
 
 const mongoose = require('mongoose');
 const Transaction = require('../models/Transaction');
+const { estimateIncomeTax } = require('../utils/tax');
 
 function toPublicTransaction(transaction) {
   const party = (value) => (value && value._id
@@ -49,7 +50,12 @@ async function listMyTransactions(req, res, next) {
   }
 }
 
-/** Income earned by the calling freelancer, in total and per month. */
+/**
+ * Income earned by the calling freelancer, plus an estimated income tax.
+ *
+ * The tax figure uses the SARS individual tables on this platform income
+ * only. It is an estimate, not an assessment (SARS, 2026).
+ */
 async function getIncomeSummary(req, res, next) {
   try {
     const match = {
@@ -74,18 +80,22 @@ async function getIncomeSummary(req, res, next) {
       { $sort: { _id: 1 } },
     ]);
 
-    return res.status(200).json({
-      income: {
-        currency: 'ZAR',
-        totalIncome: totals ? totals.totalIncome : 0,
-        transactionCount: totals ? totals.transactionCount : 0,
-        monthly: monthly.map((m) => ({
-          month: m._id,
-          income: m.income,
-          transactionCount: m.transactionCount,
-        })),
-      },
-    });
+  const totalIncome = totals ? totals.totalIncome : 0;
+
+  return res.status(200).json({
+    income: {
+      currency: 'ZAR',
+      totalIncome,
+      transactionCount: totals ? totals.transactionCount : 0,
+      monthly: monthly.map((m) => ({
+        month: m._id,
+        income: m.income,
+        transactionCount: m.transactionCount,
+      })),
+      // Bracket tax on the same total the freelancer is shown (SARS, 2026).
+      tax: estimateIncomeTax(totalIncome),
+    },
+  });
   } catch (err) {
     return next(err);
   }

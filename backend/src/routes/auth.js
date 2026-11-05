@@ -6,8 +6,9 @@
 const express = require('express');
 const { rejectUnknownFields, validate } = require('../middleware/validate');
 const { authLimiter } = require('../middleware/rateLimiters');
+const { authenticate } = require('../middleware/authenticate');
 const { registerValidators, loginValidators } = require('../validators/authValidators');
-const { register, login } = require('../controllers/authController');
+const { register, login, logout } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -27,6 +28,13 @@ router.post(
   loginValidators,
   validate,
   login
+);
+
+router.post(
+  '/logout',
+  rejectUnknownFields([]),
+  authenticate,
+  logout
 );
 
 module.exports = router;

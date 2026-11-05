@@ -34,13 +34,13 @@ async function start() {
 
   const server = https.createServer(tlsOptions, app);
 
-  server.listen(env.port, '127.0.0.1', () => {
+  server.listen(env.port, env.bindHost, () => {
     logEvent('info', 'server_started', {
       protocol: 'https',
-      host: '127.0.0.1',
+      host: env.bindHost,
       port: env.port,
     });
-    console.log(`HustleHub+ API listening on https://127.0.0.1:${env.port}`);
+    console.log(`HustleHub+ API listening on https://${env.bindHost}:${env.port}`);
     console.log('Postman: disable SSL certificate verification for this local self-signed cert.');
   });
 }

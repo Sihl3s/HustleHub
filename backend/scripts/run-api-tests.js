@@ -66,7 +66,7 @@ async function main() {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const baseUrl = `https://127.0.0.1:${server.address().port}`;
 
-  let failures = 1;
+  let failures;
   try {
     const summary = await runCollection(baseUrl);
     failures = summary.run.failures.length;

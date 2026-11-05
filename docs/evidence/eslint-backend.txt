@@ -1,0 +1,6 @@
+Static analysis: backend ESLint
+Command: npx eslint . --max-warnings 0
+Working directory: backend
+Result: passed, exit code 0. ESLint printed no findings.
+
+What this means: the recommended rules found no unused variables, undefined names, unreachable code or useless assignments in the API, its scripts and its tests. A clean result means those checks passed. It does not mean the application is free of security defects. Injection, authentication and access control are covered by the tests and by the security review in the README.

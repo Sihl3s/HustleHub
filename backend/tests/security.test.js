@@ -60,6 +60,7 @@ describe('JWT protection', () => {
     ['get', '/api/bookings/mine'],
     ['get', '/api/transactions/mine'],
     ['get', '/api/transactions/income'],
+    ['post', '/api/auth/logout'],
   ];
 
   test.each(protectedRoutes)('%s %s without a token returns 401', async (method, path) => {
@@ -315,5 +316,56 @@ describe('rate limiting', () => {
     const limited = await attempt();
     expect(limited.body.error.message).toMatch(/Too many authentication attempts/);
     expect(limited.headers.ratelimit || limited.headers['ratelimit-policy']).toBeDefined();
+  });
+});
+
+describe('account lockout and logout', () => {
+  test('five failed passwords lock the account, and an unknown email does not', async () => {
+    await registerUser('locked@example.com', 'client');
+
+    const wrong = () => request(app)
+      .post('/api/auth/login')
+      .send({ email: 'locked@example.com', password: 'WrongPass123!' });
+
+    const statuses = [];
+    for (let i = 0; i < 5; i += 1) {
+      statuses.push((await wrong()).status);
+    }
+
+    expect(statuses).toEqual([401, 401, 401, 401, 423]);
+
+    const stillLocked = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'locked@example.com', password: 'StrongPass123!' });
+    expect(stillLocked.status).toBe(423);
+
+    const unknownStatuses = [];
+    for (let i = 0; i < 5; i += 1) {
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'missing@example.com', password: 'WrongPass123!' });
+      unknownStatuses.push(res.status);
+    }
+    expect(unknownStatuses).toEqual([401, 401, 401, 401, 401]);
+  });
+
+  test('logout makes the previous access token fail', async () => {
+    const { token } = await registerUser('bye@example.com', 'freelancer');
+
+    const before = await request(app).get('/api/me').set(bearer(token));
+    expect(before.status).toBe(200);
+
+    const loggedOut = await request(app).post('/api/auth/logout').set(bearer(token));
+    expect(loggedOut.status).toBe(200);
+
+    const after = await request(app).get('/api/me').set(bearer(token));
+    expect(after.status).toBe(401);
+
+    const again = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'bye@example.com', password: 'StrongPass123!' });
+    expect(again.status).toBe(200);
+    const fresh = await request(app).get('/api/me').set(bearer(again.body.token));
+    expect(fresh.status).toBe(200);
   });
 });

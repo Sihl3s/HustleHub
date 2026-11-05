@@ -205,14 +205,23 @@ describe('GigBrowser gig management', () => {
     expect(screen.getByLabelText('Description')).toHaveValue('I\'ll design a logo <b>fast</b>.')
   })
 
-  test('the freelancer income summary is displayed', async () => {
+  test('the freelancer income and estimated tax are displayed', async () => {
     mockApi({
       'GET /api/transactions/income': {
         income: {
           currency: 'ZAR',
-          totalIncome: 750,
+          totalIncome: 300000,
           transactionCount: 3,
-          monthly: [{ month: '2026-10', income: 750, transactionCount: 3 }],
+          monthly: [{ month: '2026-10', income: 300000, transactionCount: 3 }],
+          tax: {
+            estimatedTax: 40572,
+            incomeAfterTax: 259428,
+            effectiveRate: 13.52,
+            primaryRebate: 17820,
+            brackets: [
+              { from: 0, to: 245100, ratePercent: 18, taxableAmount: 245100, tax: 44118 },
+            ],
+          },
         },
       },
     })
@@ -221,7 +230,11 @@ describe('GigBrowser gig management', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Manage gigs' }))
 
-    expect(await screen.findByText('R750')).toBeInTheDocument()
-    expect(screen.getByText('2026-10: R750 (3 bookings)')).toBeInTheDocument()
+    expect(await screen.findByRole('region', { name: 'Financial insights' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Estimated tax' })).toBeInTheDocument()
+    expect(screen.getByText('R40 572')).toBeInTheDocument()
+    expect(screen.getByText('R300 000')).toBeInTheDocument()
+    expect(screen.getByText('2026-10: R300 000 (3 bookings)')).toBeInTheDocument()
+    expect(screen.getByText(/primary rebate of R17 820/i)).toBeInTheDocument()
   })
 })

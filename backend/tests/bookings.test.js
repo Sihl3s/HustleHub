@@ -217,10 +217,37 @@ describe('viewing bookings, transactions and income', () => {
     expect(income.body.income.totalIncome).toBe(250);
   });
 
-  test('a freelancer with no bookings has zero income', async () => {
+  test('a freelancer with no bookings has zero income and zero estimated tax', async () => {
     const freelancer = await registerUser('f@example.com', 'freelancer');
     const res = await request(app).get('/api/transactions/income').set(bearer(freelancer.token));
-    expect(res.body.income).toEqual({ currency: 'ZAR', totalIncome: 0, transactionCount: 0, monthly: [] });
+    expect(res.body.income).toMatchObject({
+      currency: 'ZAR',
+      totalIncome: 0,
+      transactionCount: 0,
+      monthly: [],
+    });
+    expect(res.body.income.tax.estimatedTax).toBe(0);
+    expect(res.body.income.tax.incomeAfterTax).toBe(0);
+  });
+
+  test('income tax is estimated from the freelancer total using the SARS tables', async () => {
+    const freelancer = await registerUser('f@example.com', 'freelancer');
+    const client = await registerUser('c@example.com', 'client');
+    const gig = await createGig(freelancer.token, { price: 300000 });
+    await book(client.token, gig.id);
+
+    const res = await request(app).get('/api/transactions/income').set(bearer(freelancer.token));
+    expect(res.status).toBe(200);
+    expect(res.body.income.totalIncome).toBe(300000);
+    expect(res.body.income.tax).toMatchObject({
+      taxYear: '2027',
+      currency: 'ZAR',
+      taxableIncome: 300000,
+      estimatedTax: 40572,
+      incomeAfterTax: 259428,
+      effectiveRate: 13.52,
+      primaryRebate: 17820,
+    });
   });
 });
 

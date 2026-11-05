@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiRequest, decodeHtml } from './api.js'
+import FinancialInsights from './FinancialInsights.jsx'
 
 const categories = ['Design', 'Development', 'Writing', 'Marketing']
 const emptyForm = {
@@ -439,24 +440,7 @@ export default function GigBrowser({ user, onLogout }) {
           <h1>Manage your gigs</h1>
           <Notice notice={notice} />
 
-          <div className="income-summary">
-            <h2>Income summary</h2>
-            <p>
-              Total income: <strong>R{income.totalIncome}</strong>
-            </p>
-            <p>
-              Transactions: <strong>{income.transactionCount}</strong>
-            </p>
-            {income.monthly.length > 0 && (
-              <ul>
-                {income.monthly.map((month) => (
-                  <li key={month.month}>
-                    {month.month}: R{month.income} ({month.transactionCount} bookings)
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <FinancialInsights income={income} />
 
           <p className="market-intro">
             Create a service listing or update the ones you have added.

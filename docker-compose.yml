@@ -1,0 +1,36 @@
+# Local orchestration for the API, the React client and MongoDB.
+# The published web port is HTTP. The API still speaks HTTPS inside the network.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      BIND_HOST: 0.0.0.0
+      PORT: 3443
+      NODE_ENV: production
+      ENABLE_HSTS: "false"
+      MONGODB_URI: mongodb://mongo:27017/hustlehub
+      JWT_SECRET: ${JWT_SECRET:-local-docker-development-secret-not-for-production-use}
+      LOG_FILE: /tmp/hustlehub-events.jsonl
+    ports:
+      - "3443:3443"
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "8080:8080"
+
+volumes:
+  mongo-data:
