@@ -149,7 +149,9 @@ HustleHub+ follows a **3-tier architecture**: the React presentation tier, the E
 
 ![HustleHub+ Architecture Diagram](docs/images/architecture-diagram-part-2.png)
 
-The up-to-date Part 2 diagram, including the security middleware chain and the booking sequence, is in [docs/architecture.md](docs/architecture.md).
+The Part 2 diagram, including the security middleware chain and the booking sequence, is in [docs/architecture.md](docs/architecture.md). The Part 3 figure below shows the Docker Compose stack: the web container, the API container (income, tax estimate and event log) and the MongoDB container.
+
+![Part 3 container diagram](docs/images/architecture-diagram-poe.png)
 
 ```mermaid
 flowchart LR
@@ -640,6 +642,12 @@ Screenshots of the running application (React frontend on Vite, HTTPS API and a 
 | ![Freelancer bookings](docs/screenshots/11-freelancer-bookings.png) | ![Freelancer income summary](docs/screenshots/12-freelancer-income-summary.png) |
 
 The logo gig was booked at R850 and its price was later changed to R950. The booking and income still show R850, because the price is taken from the gig at booking time and the client can never set it.
+
+### Freelancer: financial insights
+
+![Freelancer financial insights](docs/screenshots/17-freelancer-financial-insights.png)
+
+This screen is the Part 3 income and tax view on **Manage gigs**. The example has R3 200 of platform income in November 2026. The 18% bracket produces R576 of gross tax. The primary rebate is R17 820, which is larger than R576, so the estimated tax is R0, the amount after the estimate stays R3 200, and the effective rate is 0%. The green bar is that month's income. The bracket line shows the tax before the rebate is subtracted (SARS, 2026).
 
 ### Security in the interface
 

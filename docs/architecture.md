@@ -68,3 +68,23 @@ sequenceDiagram
   A-->>C: 201 confirmed, reference HH-XXXXXXXX
   Note over A,M: Freelancer later reads GET /api/bookings/mine and GET /api/transactions/income
 ```
+
+# Part 3: containers, tax and logging
+
+Docker Compose runs three containers. The browser talks to the web container. That container serves the React app and proxies `/api` to the API over HTTPS. The API calculates the tax estimate, reads and writes MongoDB, and appends events to a log file (Docker, 2026; SARS, 2026; OWASP, 2025b).
+
+```mermaid
+flowchart LR
+  Browser[Browser] -->|"HTTP on port 8080"| Web["web container: Nginx and React"]
+  Web -->|"HTTPS /api proxy"| Api["api container: Express"]
+  Api --> Tax["tax.js SARS estimate"]
+  Api --> Mongo[("mongo container: users, gigs, bookings, transactions")]
+  Api --> Log["/tmp/hustlehub-events.jsonl"]
+  Mongo --> Volume[mongo-data volume]
+```
+
+![Part 3 container diagram](images/architecture-diagram-poe.png)
+
+The figure shows the same three containers. The web container is Nginx with the React build. The API container holds the income summary, the SARS tax estimate, the event logger and the security checks. The MongoDB container stores the collections on the `mongo-data` volume. The log file path in the figure is the `LOG_FILE` set by Compose.
+
+Sources for the citations in this file are in the repository README reference list.
