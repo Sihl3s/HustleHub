@@ -661,7 +661,7 @@ This screen is the Part 3 income and tax view on **Manage gigs**. The example ha
 
 - **Part 1 demo video:** https://youtu.be/ZT6XeQMRhIE
 - **Part 2 demo video:** https://youtu.be/M-qCpdE5P2A
-- **Part 3 demonstration video:**
+- **Part 3 demonstration video:** https://youtu.be/6qO2HWUSzOA
 - **Pipeline:** [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs install, backend tests, frontend tests, ESLint and both builds
 - **Static analysis results:** [docs/evidence/eslint-backend.txt](docs/evidence/eslint-backend.txt) and [docs/evidence/eslint-frontend.txt](docs/evidence/eslint-frontend.txt). Both runs exited 0 with no findings. See [Static analysis](#static-analysis)
 - **Logging evidence:** [docs/evidence/part3-events.jsonl](docs/evidence/part3-events.jsonl) shows login, lockout, booking, transaction, logout and error lines with no passwords or tokens
