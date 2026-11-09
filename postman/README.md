@@ -1,11 +1,12 @@
 # Postman collection and Newman
 
-`postman/HustleHub.postman_collection.json` covers the Part 2 API in four folders:
+`postman/HustleHub.postman_collection.json` covers the API in five folders:
 
 1. **Authentication**: register (freelancer, second freelancer, client), invalid input, duplicate email, admin self-registration refused, login success and failure, `/api/me` with and without a token.
 2. **Gigs**: create, browse, view, list own, update, invalid input, delete.
-3. **Bookings and transactions**: client books a gig, bookings for client and freelancer, booking by id, transactions for both roles, freelancer income summary.
+3. **Bookings and transactions**: client books a gig, bookings for client and freelancer, booking by id, transactions for both roles, freelancer income summary with the estimated tax breakdown.
 4. **Security and access control**: missing and tampered JWTs, RBAC (client creating gigs, freelancer booking, client reading income), ownership (another freelancer editing or deleting a gig, an outsider viewing a booking), price tampering, NoSQL injection, XSS escaping, malformed JSON, invalid ids and security headers.
+5. **Logout and account lockout**: a client logs out and the old token is refused (401) on `/api/me` and a protected route; five wrong passwords on one real account lock it (the fifth returns 423), and the correct password is then refused too (423).
 
 Every request has `pm.test` assertions, and tokens and ids are passed between requests through collection variables. Each run generates fresh email addresses, so the collection can be run repeatedly.
 
@@ -40,10 +41,11 @@ This starts the HTTPS API on a free local port with an in-memory MongoDB and a t
 | Register / login success | 201 / 200 with a JWT |
 | Invalid input, unexpected fields, NoSQL injection, malformed JSON, invalid id | 400 |
 | Duplicate email | 409 |
-| Missing or tampered JWT, wrong password | 401 |
+| Missing, tampered or logged-out JWT, wrong password | 401 |
 | Wrong role (client creating gigs, freelancer booking, client reading income) | 403 |
 | Editing or deleting another freelancer's gig | 403 |
 | Viewing someone else's booking | 404 |
 | Booking a gig | 201 with a confirmation reference and transaction |
+| Fifth wrong password, then any login on the locked account | 423 |
 
 The Part 1 demo video is linked in the root README.

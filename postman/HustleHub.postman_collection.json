@@ -938,6 +938,15 @@
                   "  pm.expect(income.totalIncome).to.eql(1800);",
                   "  pm.expect(income.transactionCount).to.eql(1);",
                   "  pm.expect(income.currency).to.eql('ZAR');",
+                  "});",
+                  "pm.test('Body includes the estimated tax', () => {",
+                  "  pm.expect(income.tax).to.be.an('object');",
+                  "  pm.expect(income.tax.estimatedTax).to.be.a('number');",
+                  "  pm.expect(income.tax.taxableIncome).to.eql(income.totalIncome);",
+                  "  pm.expect(income.tax.grossTax).to.eql(324);",
+                  "  pm.expect(income.tax.estimatedTax).to.eql(0);",
+                  "  pm.expect(income.tax.incomeAfterTax).to.eql(1800);",
+                  "  pm.expect(income.tax.brackets).to.be.an('array').that.is.not.empty;",
                   "});"
                 ]
               }
@@ -1224,7 +1233,12 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No income or tax data is returned', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.not.have.property('income');",
+                  "  pm.expect(pm.response.text()).to.not.include('estimatedTax');",
+                  "});"
                 ]
               }
             }
@@ -1461,6 +1475,301 @@
                   "type": "string"
                 }
               ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Logout and account lockout",
+      "item": [
+        {
+          "name": "Client logs out (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Logout is confirmed', () => pm.expect(pm.response.json().message).to.eql('Logged out'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{clientToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Old token fails after logout (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Error does not leak user data', () => pm.expect(pm.response.text()).to.not.include('client' + pm.collectionVariables.get('runId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{clientToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Old token also fails on a protected route (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/transactions/mine",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{clientToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong password 1 of 5 (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Wr0ngPass!1\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong password 2 of 5 (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Wr0ngPass!2\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong password 3 of 5 (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Wr0ngPass!3\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong password 4 of 5 (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Wr0ngPass!4\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong password 5 of 5 locks the account (423)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 423', () => pm.response.to.have.status(423));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Wr0ngPass!5\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Locked account refuses the correct password (423)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 423', () => pm.response.to.have.status(423));",
+                  "pm.test('No token issued', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"freelancer2{{runId}}@example.com\",\n  \"password\": \"Str0ngPass!\"\n}"
             }
           },
           "response": []
